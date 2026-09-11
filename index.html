@@ -332,27 +332,29 @@
             }
         }
 
-        async function fetchSheetData() {
-            const loading = document.getElementById('pyq-loading');
-            loading.style.display = 'block';
-            
-            try {
-                // 1. Fetch PYQ Data (Sheet1)
-                let response = await fetch(SHEETDB_URL);
-                allData = await response.json();
-                populateUniversities();
+  async function fetchSheetData() {
+    const loading = document.getElementById('pyq-loading');
+    if (loading) loading.style.display = 'block';
 
-                // 2. Fetch Syllabus Data from "Syllabus" tab
-                let syllabusResponse = await fetch(SHEETDB_URL + "?sheet=Syllabus");
-                syllabusData = await syllabusResponse.json();
-                populateSyllabus();
+    try {
+        // Both PYQ and Syllabus data fetched at the same time (Parallel)
+        const [pyqRes, syllabusRes] = await Promise.all([
+            fetch(SHEETDB_URL),
+            fetch(SHEETDB_URL + "?sheet=Syllabus")
+        ]);
 
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-            
-            loading.style.display = 'none';
-        }
+        allData = await pyqRes.json();
+        syllabusData = await syllabusRes.json();
+
+        populateUniversities();
+        populateSyllabus();
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    } finally {
+        if (loading) loading.style.display = 'none';
+    }
+  }
+        
 
         /* ----- PYQ LOGIC ----- */
         function populateUniversities() {

@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>+3 PYQ & Syllabus Hub</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --yt-red: #ff0000;
+            --yt-red-hover: #cc0000;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-top: 10px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        header p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        /* YouTube Subscribe Button */
+        .yt-sub-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background-color: var(--yt-red);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            box-shadow: 0 2px 8px rgba(255, 0, 0, 0.2);
+        }
+
+        .yt-sub-btn:hover {
+            background-color: var(--yt-red-hover);
+        }
+
+        /* Navigation Tabs */
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 10px 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-main);
+        }
+
+        select, input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background-color: #fff;
+            color: var(--text-main);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        select:focus, input:focus, textarea:focus {
+            border-color: var(--primary);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+        }
+
+        .result-box a {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #10b981;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .note {
+            font-size: 0.8rem;
+            color: #d97706;
+            background: #fef3c7;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .loading {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>+3 PYQ & Syllabus Hub</h1>
+            <p>Odisha Universities NEP Model Data</p>
+            <a href="https://www.youtube.com/@Studywithsanjibs" target="_blank" class="yt-sub-btn">
+                ▶ Subscribe: Study With Sanjib
+            </a>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('download-pyq')">Download PYQ</button>
+            <button class="tab-btn" onclick="switchTab('download-syllabus')">Download Syllabus</button>
+            <button class="tab-btn" onclick="switchTab('upload-pyq')">Upload PYQ</button>
+        </div>
+
+        <!-- TAB 1: Download PYQ -->
+        <div id="download-pyq" class="tab-content active">
+            <div class="form-group">
+                <label>1. Select University</label>
+                <select id="uni-select" onchange="loadSubjects()">
+                    <option value="">-- Choose University --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>2. Select Major Subject</label>
+                <select id="sub-select" onchange="loadSemesters()" disabled>
+                    <option value="">-- Choose Subject --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>3. Select Semester</label>
+                <select id="sem-select" onchange="loadPapers()" disabled>
+                    <option value="">-- Choose Semester --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>4. Select Paper</label>
+                <select id="paper-select" onchange="loadYears()" disabled>
+                    <option value="">-- Choose Paper --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>5. Select Year</label>
+                <select id="year-select" onchange="showDownloadLink()" disabled>
+                    <option value="">-- Choose Year --</option>
+                </select>
+            </div>
+
+            <div id="pyq-loading" class="loading">Loading data from database...</div>
+
+            <div id="pyq-result" class="result-box">
+                <p id="paper-details" style="font-weight: 600; margin-bottom: 5px;"></p>
+                <a id="download-btn" href="#" target="_blank">Download Question Paper</a>
+            </div>
+        </div>
+
+        <!-- TAB 2: Download Syllabus (DYNAMIC FROM SHEET) -->
+        <div id="download-syllabus" class="tab-content">
+            <div class="note">Note: As per NEP 2020, the Model Syllabus is mostly common across all state universities.</div>
+
+            <div class="form-group">
+                <label>1. Select Category</label>
+                <select id="syllabus-category-select" onchange="loadSyllabusSemesters()">
+                    <option value="">-- Choose Category --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>2. Select Semester</label>
+                <select id="syllabus-sem-select" onchange="loadSyllabusSubjects()" disabled>
+                    <option value="">-- Choose Semester --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>3. Select Subject</label>
+                <select id="syllabus-sub-select" onchange="showSyllabus()" disabled>
+                    <option value="">-- Choose Subject --</option>
+                </select>
+            </div>
+
+            <div id="syllabus-result" class="result-box">
+                <p id="syllabus-details" style="font-weight: 600; margin-bottom: 5px;">NEP Model Syllabus PDF</p>
+                <a id="syllabus-download-btn" href="#" target="_blank">Download Syllabus PDF</a>
+            </div>
+        </div>
+
+        <!-- TAB 3: Upload PYQ -->
+        <div id="upload-pyq" class="tab-content">
+            <div class="note" style="background: #e0f2fe; color: #0369a1;">
+                Admin Note: Students please upload ONLY previous year question papers here. Verified files will be updated by the admin.
+            </div>
+            <div style="text-align: center; padding: 30px 10px;">
+                <p style="margin-bottom: 15px; font-size: 0.95rem; color: var(--text-main);">Have a question paper to share? Click below to upload securely via our official form.</p>
+                <a href="https://forms.gle/3yTtyBHSWJbjLXEZ7" target="_blank" class="btn">Open Upload Form 📤</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SHEETDB_URL = "https://sheetdb.io/api/v1/3ba1qm1oey761";
+        let allData = [];
+        let syllabusData = [];
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            if (typeof event !== 'undefined' && event && event.currentTarget) {
+                event.currentTarget.classList.add('active');
+            }
+        }
+
+        async function fetchSheetData() {
+            const loading = document.getElementById('pyq-loading');
+            loading.style.display = 'block';
+            
+            try {
+                // 1. Fetch PYQ Data (Sheet1)
+                let response = await fetch(SHEETDB_URL);
+                allData = await response.json();
+                populateUniversities();
+
+                // 2. Fetch Syllabus Data from "Syllabus" tab
+                let syllabusResponse = await fetch(SHEETDB_URL + "?sheet=Syllabus");
+                syllabusData = await syllabusResponse.json();
+                populateSyllabus();
+
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+            
+            loading.style.display = 'none';
+        }
+
+        /* ----- PYQ LOGIC ----- */
+        function populateUniversities() {
+            let uniSelect = document.getElementById('uni-select');
+            let universities = [...new Set(allData.map(item => item.university))];
+            uniSelect.innerHTML = '<option value="">-- Choose University --</option>';
+            universities.forEach(uni => {
+                if(uni) uniSelect.innerHTML += `<option value="${uni}">${uni}</option>`;
+            });
+        }
+
+        function loadSubjects() {
+            let uni = document.getElementById('uni-select').value;
+            let subSelect = document.getElementById('sub-select');
+            subSelect.innerHTML = '<option value="">-- Choose Subject --</option>';
+            subSelect.disabled = !uni;
+            
+            document.getElementById('sem-select').disabled = true;
+            document.getElementById('paper-select').disabled = true;
+            document.getElementById('year-select').disabled = true;
+            document.getElementById('pyq-result').style.display = 'none';
+
+            if(uni) {
+                let subjects = [...new Set(allData.filter(item => item.university === uni).map(item => item.subject))];
+                subjects.forEach(sub => {
+                    if(sub) subSelect.innerHTML += `<option value="${sub}">${sub}</option>`;
+                });
+            }
+        }
+
+        function loadSemesters() {
+            let uni = document.getElementById('uni-select').value;
+            let sub = document.getElementById('sub-select').value;
+            let semSelect = document.getElementById('sem-select');
+            semSelect.innerHTML = '<option value="">-- Choose Semester --</option>';
+            semSelect.disabled = !sub;
+            
+            document.getElementById('paper-select').disabled = true;
+            document.getElementById('year-select').disabled = true;
+            document.getElementById('pyq-result').style.display = 'none';
+
+            if(sub) {
+                let semesters = [...new Set(allData.filter(item => item.university === uni && item.subject === sub).map(item => item.semester))];
+                semesters.forEach(sem => {
+                    if(sem) semSelect.innerHTML += `<option value="${sem}">${sem}</option>`;
+                });
+            }
+        }
+
+        function loadPapers() {
+            let uni = document.getElementById('uni-select').value;
+            let sub = document.getElementById('sub-select').value;
+            let sem = document.getElementById('sem-select').value;
+            let paperSelect = document.getElementById('paper-select');
+            paperSelect.innerHTML = '<option value="">-- Choose Paper --</option>';
+            paperSelect.disabled = !sem;
+            
+            document.getElementById('year-select').disabled = true;
+            document.getElementById('pyq-result').style.display = 'none';
+
+            if(sem) {
+                let papers = [...new Set(allData.filter(item => 
+                    item.university === uni && 
+                    item.subject === sub && 
+                    item.semester === sem
+                ).map(item => item.papername))];
+
+                papers.forEach(p => {
+                    if(p) paperSelect.innerHTML += `<option value="${p}">${p}</option>`;
+                });
+            }
+        }
+
+        function loadYears() {
+            let uni = document.getElementById('uni-select').value;
+            let sub = document.getElementById('sub-select').value;
+            let sem = document.getElementById('sem-select').value;
+            let paper = document.getElementById('paper-select').value;
+            let yearSelect = document.getElementById('year-select');
+            
+            yearSelect.innerHTML = '<option value="">-- Choose Year --</option>';
+            yearSelect.disabled = !paper;
+            document.getElementById('pyq-result').style.display = 'none';
+
+            if(paper) {
+                let yearData = allData.filter(item => 
+                    item.university === uni && 
+                    item.subject === sub && 
+                    item.semester === sem &&
+                    item.papername === paper
+                );
+
+                yearData.forEach(item => {
+                    if(item.year && item.drivelink) {
+                        yearSelect.innerHTML += `<option value="${item.drivelink}">${item.year}</option>`;
+                    }
+                });
+            }
+        }
+
+        function showDownloadLink() {
+            let select = document.getElementById('year-select');
+            let linkBox = document.getElementById('pyq-result');
+            let downloadBtn = document.getElementById('download-btn');
+            let details = document.getElementById('paper-details');
+            let paperSelect = document.getElementById('paper-select');
+
+            if(select.value) {
+                downloadBtn.href = select.value;
+                details.innerText = paperSelect.options[paperSelect.selectedIndex].text + " (" + select.options[select.selectedIndex].text + ")";
+                linkBox.style.display = 'block';
+            } else {
+                linkBox.style.display = 'none';
+            }
+        }
+
+        /* ----- SYLLABUS LOGIC ----- */
+
+        // Supports the exact column names from the "Syllabus" sheet:
+        // Category | Semester | SubjectName | DriveLink
+        function getSyllabusField(item, names) {
+            for (const name of names) {
+                if (item[name] !== undefined && item[name] !== null && String(item[name]).trim() !== "") {
+                    return String(item[name]).trim();
+                }
+            }
+            return "";
+        }
+
+        function populateSyllabus() {
+            const categorySelect = document.getElementById('syllabus-category-select');
+            const semSelect = document.getElementById('syllabus-sem-select');
+            const subSelect = document.getElementById('syllabus-sub-select');
+
+            categorySelect.innerHTML = '<option value="">-- Choose Category --</option>';
+            semSelect.innerHTML = '<option value="">-- Choose Semester --</option>';
+            subSelect.innerHTML = '<option value="">-- Choose Subject --</option>';
+
+            semSelect.disabled = true;
+            subSelect.disabled = true;
+            document.getElementById('syllabus-result').style.display = 'none';
+
+            if (!Array.isArray(syllabusData)) return;
+
+            const categories = [...new Set(
+                syllabusData
+                    .map(item => getSyllabusField(item, ['Category', 'category']))
+                    .filter(Boolean)
+            )];
+
+            categories.forEach(category => {
+                categorySelect.innerHTML += `<option value="${category}">${category}</option>`;
+            });
+        }
+
+        function loadSyllabusSemesters() {
+            const category = document.getElementById('syllabus-category-select').value;
+            const semSelect = document.getElementById('syllabus-sem-select');
+            const subSelect = document.getElementById('syllabus-sub-select');
+
+            semSelect.innerHTML = '<option value="">-- Choose Semester --</option>';
+            subSelect.innerHTML = '<option value="">-- Choose Subject --</option>';
+
+            semSelect.disabled = !category;
+            subSelect.disabled = true;
+            document.getElementById('syllabus-result').style.display = 'none';
+
+            if (!category) return;
+
+            const semesters = [...new Set(
+                syllabusData
+                    .filter(item => getSyllabusField(item, ['Category', 'category']) === category)
+                    .map(item => getSyllabusField(item, ['Semester', 'semester']))
+                    .filter(Boolean)
+            )];
+
+            semesters.forEach(semester => {
+                semSelect.innerHTML += `<option value="${semester}">${semester}</option>`;
+            });
+        }
+
+        function loadSyllabusSubjects() {
+            const category = document.getElementById('syllabus-category-select').value;
+            const semester = document.getElementById('syllabus-sem-select').value;
+            const subSelect = document.getElementById('syllabus-sub-select');
+
+            subSelect.innerHTML = '<option value="">-- Choose Subject --</option>';
+            subSelect.disabled = !semester;
+            document.getElementById('syllabus-result').style.display = 'none';
+
+            if (!semester) return;
+
+            const subjects = syllabusData.filter(item =>
+                getSyllabusField(item, ['Category', 'category']) === category &&
+                getSyllabusField(item, ['Semester', 'semester']) === semester
+            );
+
+            subjects.forEach(item => {
+                const subjectName = getSyllabusField(item, ['SubjectName', 'Subject Name', 'subjectname', 'subject']);
+                const driveLink = getSyllabusField(item, ['DriveLink', 'Drive Link', 'drivelink']);
+
+                if (subjectName && driveLink) {
+                    // Store the DriveLink as the option value so the selected
+                    // subject always opens its own syllabus PDF.
+                    subSelect.innerHTML += `<option value="${driveLink}">${subjectName}</option>`;
+                }
+            });
+        }
+
+        function showSyllabus() {
+            const select = document.getElementById('syllabus-sub-select');
+            const resBox = document.getElementById('syllabus-result');
+            const btn = document.getElementById('syllabus-download-btn');
+            const details = document.getElementById('syllabus-details');
+
+            if (select.value) {
+                btn.href = select.value;
+
+                const category = document.getElementById('syllabus-category-select').value;
+                const semester = document.getElementById('syllabus-sem-select').value;
+                const subject = select.options[select.selectedIndex].text;
+
+                details.innerText = `${category} • ${semester} • ${subject} Model Syllabus PDF`;
+                resBox.style.display = 'block';
+            } else {
+                resBox.style.display = 'none';
+            }
+        }
+
+        window.onload = fetchSheetData;
+    </script>
+</body>
+</html>
+

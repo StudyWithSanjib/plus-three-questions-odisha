@@ -337,23 +337,23 @@
     if (loading) loading.style.display = 'block';
 
     try {
-        // Both PYQ and Syllabus data fetched at the same time (Parallel)
-        const [pyqRes, syllabusRes] = await Promise.all([
-            fetch(SHEETDB_URL),
-            fetch(SHEETDB_URL + "?sheet=Syllabus")
-        ]);
-
-        allData = await pyqRes.json();
-        syllabusData = await syllabusRes.json();
-
+        // 1. Fetch PYQ Data first
+        let response = await fetch(SHEETDB_URL);
+        allData = await response.json();
         populateUniversities();
+
+        // 2. Fetch Syllabus Data
+        let syllabusResponse = await fetch(SHEETDB_URL + "?sheet=Syllabus");
+        syllabusData = await syllabusResponse.json();
         populateSyllabus();
+
     } catch (error) {
         console.error("Error fetching data:", error);
     } finally {
         if (loading) loading.style.display = 'none';
     }
   }
+        
         
 
         /* ----- PYQ LOGIC ----- */

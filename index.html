@@ -788,7 +788,7 @@
     <div class="menu-drawer" id="menu-drawer">
         <div class="menu-drawer-header">
             <h2>+3 PYQ & Syllabus Hub</h2>
-            <button type="button" class="menu-close-btn" onclick="closeMenu()">&times;</button>
+            <button type="button" class="menu-close-btn" onclick="closeMenu()" aria-label="Close menu">&times;</button>
         </div>
         <nav class="menu-nav">
             <a href="index.html" onclick="closeMenu()"><span class="menu-icon">🏠</span> Home</a>
@@ -806,7 +806,7 @@
     <div class="container">
         <div class="top-bar">
             <button type="button" class="hamburger-btn" id="hamburger-btn" onclick="openMenu()" aria-label="Open menu">☰</button>
-            <button type="button" class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()">
+            <button type="button" class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle dark mode">
                 <span id="theme-toggle-icon">🌙</span> <span id="theme-toggle-label">Dark Mode</span>
             </button>
         </div>
@@ -837,9 +837,9 @@
 
         <!-- Navigation Tabs -->
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('download-pyq')">Download PYQ</button>
-            <button class="tab-btn" onclick="switchTab('download-syllabus')">Download Syllabus</button>
-            <button class="tab-btn" onclick="switchTab('upload-pyq')">Upload PYQ</button>
+            <button class="tab-btn active" onclick="switchTab('download-pyq', event)">Download PYQ</button>
+            <button class="tab-btn" onclick="switchTab('download-syllabus', event)">Download Syllabus</button>
+            <button class="tab-btn" onclick="switchTab('upload-pyq', event)">Upload PYQ</button>
         </div>
 
             <!-- TAB 1: Download PYQ -->
@@ -993,7 +993,7 @@
         <div class="pdf-modal">
             <div class="pdf-modal-header">
                 <h3 id="pdf-modal-title">Preview</h3>
-                <button type="button" class="pdf-modal-close" onclick="closePdfModal()">&times;</button>
+                <button type="button" class="pdf-modal-close" onclick="closePdfModal()" aria-label="Close preview">&times;</button>
             </div>
             <div class="pdf-modal-body">
                 <iframe id="pdf-modal-iframe" src="" title="PDF Preview"></iframe>
@@ -1005,10 +1005,38 @@
     </div>
 
     <script>
-        const SHEETDB_URL = "https://script.google.com/macros/s/AKfycbyP-_UxuLc6cvWUTtkgD3wb--e5OUOeFitbO1V8iC8oNaVosTCDiUHsgTBPedDEwnLb/exec";
+        const SHEETDB_URL = "https://script.google.com/macros/s/AKfycbyHONQkgmzDy7aioQ-al2Ms8o-Ty_IXCyT1yWMskn4MFeT81oWeKRvNpYwGjPikUu2W/exec";
         const CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes cache, so repeat visits load instantly
+        const FETCH_TIMEOUT_MS = 15000; // 15s timeout so a hung request doesn't spin forever
         let allData = [];
         let syllabusData = [];
+
+        // ----- Security helper: escape any value before inserting into innerHTML -----
+        // Sheet data (university/subject/paper names, drive links, etc.) is treated as
+        // untrusted text. Without this, a stray "<" or quote typed into the Google Sheet
+        // (accidentally or maliciously) could break the page or run script in every visitor's
+        // browser (stored XSS). Always route dynamic text through this before innerHTML use.
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // Small helper to add a timeout to fetch() so a stalled network request
+        // (or an overloaded Apps Script backend) fails fast instead of hanging forever.
+        async function fetchWithTimeout(url, ms) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), ms);
+            try {
+                return await fetch(url, { signal: controller.signal });
+            } finally {
+                clearTimeout(timer);
+            }
+        }
 
             let isSyllabusLoaded = false;
 
@@ -1135,7 +1163,7 @@
             matches.slice(0, 15).forEach((m, idx) => {
                 const div = document.createElement('div');
                 div.className = 'search-result-item';
-                div.innerHTML = `<span class="tag ${m.type}">${m.type === 'pyq' ? 'PYQ' : 'SYLLABUS'}</span>${m.label}`;
+                div.innerHTML = `<span class="tag ${m.type}">${m.type === 'pyq' ? 'PYQ' : 'SYLLABUS'}</span>${escapeHtml(m.label)}`;
                 div.onclick = () => selectSearchResult(m);
                 resultsBox.appendChild(div);
             });
@@ -1348,13 +1376,36 @@
             list.forEach(item => {
                 const row = document.createElement('div');
                 row.className = 'saved-item';
-                row.innerHTML = `
-                    <span>${item.type === 'pyq' ? '📄' : '📘'} ${item.title}</span>
-                    <span class="saved-item-actions">
-                        <button title="Preview" onclick='openPdfModal(${JSON.stringify(item.url)}, ${JSON.stringify(item.title)})'>👁️</button>
-                        <button title="Remove" onclick='removeSavedPaper(${JSON.stringify(item.id)})'>🗑️</button>
-                    </span>
-                `;
+
+                // Built with DOM methods (not innerHTML) so a title containing
+                // <, >, quotes, or apostrophes can never break the markup or
+                // execute as script - this also fixed a real bug where a saved
+                // paper title with an apostrophe (e.g. "Newton's Laws") would
+                // break the old inline onclick attribute.
+                const label = document.createElement('span');
+                label.textContent = `${item.type === 'pyq' ? '📄' : '📘'} ${item.title}`;
+
+                const actions = document.createElement('span');
+                actions.className = 'saved-item-actions';
+
+                const previewBtn = document.createElement('button');
+                previewBtn.type = 'button';
+                previewBtn.title = 'Preview';
+                previewBtn.setAttribute('aria-label', 'Preview ' + item.title);
+                previewBtn.textContent = '👁️';
+                previewBtn.addEventListener('click', () => openPdfModal(item.url, item.title));
+
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.title = 'Remove';
+                removeBtn.setAttribute('aria-label', 'Remove ' + item.title);
+                removeBtn.textContent = '🗑️';
+                removeBtn.addEventListener('click', () => removeSavedPaper(item.id));
+
+                actions.appendChild(previewBtn);
+                actions.appendChild(removeBtn);
+                row.appendChild(label);
+                row.appendChild(actions);
                 body.appendChild(row);
             });
         }
@@ -1366,12 +1417,12 @@
             caret.textContent = body.classList.contains('open') ? '▴' : '▾';
         }
 
-        function switchTab(tabId) {
+        function switchTab(tabId, evt) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-            if (typeof event !== 'undefined' && event && event.currentTarget) {
-                event.currentTarget.classList.add('active');
+            if (evt && evt.currentTarget) {
+                evt.currentTarget.classList.add('active');
             }
 
             if (tabId === 'download-syllabus') {
@@ -1379,7 +1430,18 @@
             }
         }
 
+        // Simple per-endpoint cooldown so a user mashing "Try Again" (or a bot doing it
+        // automatically) can't flood the Apps Script backend with requests.
+        const RETRY_COOLDOWN_MS = 4000;
+        let lastPyqFetchAt = 0;
+        let lastSyllabusFetchAt = 0;
+
         async function fetchSheetData(forceRefresh) {
+            if (forceRefresh) {
+                const now = Date.now();
+                if (now - lastPyqFetchAt < RETRY_COOLDOWN_MS) return;
+                lastPyqFetchAt = now;
+            }
             const loading = document.getElementById('pyq-loading');
             const formContent = document.getElementById('pyq-form-content');
             const errorBox = document.getElementById('pyq-error');
@@ -1402,7 +1464,7 @@
             formContent.style.display = 'none';
 
             try {
-                let response = await fetch(SHEETDB_URL);
+                let response = await fetchWithTimeout(SHEETDB_URL, FETCH_TIMEOUT_MS);
                 if (!response.ok) throw new Error('Network response was not ok');
                 allData = await response.json();
                 setCache('pyq-data', allData);
@@ -1419,6 +1481,11 @@
 
                 async function fetchSyllabusData(forceRefresh) {
             if (isSyllabusLoaded && !forceRefresh) return;
+            if (forceRefresh) {
+                const now = Date.now();
+                if (now - lastSyllabusFetchAt < RETRY_COOLDOWN_MS) return;
+                lastSyllabusFetchAt = now;
+            }
 
             const loading = document.getElementById('syllabus-loading');
             const formContent = document.getElementById('syllabus-form-content');
@@ -1442,7 +1509,7 @@
             formContent.style.display = 'none';
 
             try {
-                let syllabusResponse = await fetch(SHEETDB_URL + "?sheet=Syllabus");
+                let syllabusResponse = await fetchWithTimeout(SHEETDB_URL + "?sheet=Syllabus", FETCH_TIMEOUT_MS);
                 if (!syllabusResponse.ok) throw new Error('Network response was not ok');
                 syllabusData = await syllabusResponse.json();
                 setCache('syllabus-data', syllabusData);
@@ -1469,7 +1536,7 @@
             let universities = [...new Set(allData.map(item => item.university))];
             uniSelect.innerHTML = '<option value="">-- Choose University --</option>';
             universities.forEach(uni => {
-                if(uni) uniSelect.innerHTML += `<option value="${uni}">${uni}</option>`;
+                if(uni) uniSelect.innerHTML += `<option value="${escapeHtml(uni)}">${escapeHtml(uni)}</option>`;
             });
         }
 
@@ -1487,7 +1554,7 @@
             if(uni) {
                 let subjects = [...new Set(allData.filter(item => item.university === uni).map(item => item.subject))];
                 subjects.forEach(sub => {
-                    if(sub) subSelect.innerHTML += `<option value="${sub}">${sub}</option>`;
+                    if(sub) subSelect.innerHTML += `<option value="${escapeHtml(sub)}">${escapeHtml(sub)}</option>`;
                 });
             }
         }
@@ -1506,7 +1573,7 @@
             if(sub) {
                 let semesters = [...new Set(allData.filter(item => item.university === uni && item.subject === sub).map(item => item.semester))];
                 semesters.forEach(sem => {
-                    if(sem) semSelect.innerHTML += `<option value="${sem}">${sem}</option>`;
+                    if(sem) semSelect.innerHTML += `<option value="${escapeHtml(sem)}">${escapeHtml(sem)}</option>`;
                 });
             }
         }
@@ -1536,7 +1603,7 @@
                 }
 
                 papers.forEach(p => {
-                    if(p) paperSelect.innerHTML += `<option value="${p}">${p}</option>`;
+                    if(p) paperSelect.innerHTML += `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`;
                 });
             }
         }
@@ -1570,7 +1637,7 @@
                 }
 
                 yearData.forEach(item => {
-                    yearSelect.innerHTML += `<option value="${item.drivelink}">${item.year}</option>`;
+                    yearSelect.innerHTML += `<option value="${escapeHtml(item.drivelink)}">${escapeHtml(item.year)}</option>`;
                 });
             }
         }
@@ -1633,7 +1700,7 @@
             )];
 
             categories.forEach(category => {
-                categorySelect.innerHTML += `<option value="${category}">${category}</option>`;
+                categorySelect.innerHTML += `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`;
             });
         }
 
@@ -1659,7 +1726,7 @@
             )];
 
             semesters.forEach(semester => {
-                semSelect.innerHTML += `<option value="${semester}">${semester}</option>`;
+                semSelect.innerHTML += `<option value="${escapeHtml(semester)}">${escapeHtml(semester)}</option>`;
             });
         }
 
@@ -1689,7 +1756,7 @@
                 if (subjectName && driveLink) {
                     // Store the DriveLink as the option value so the selected
                     // subject always opens its own syllabus PDF.
-                    subSelect.innerHTML += `<option value="${driveLink}">${subjectName}</option>`;
+                    subSelect.innerHTML += `<option value="${escapeHtml(driveLink)}">${escapeHtml(subjectName)}</option>`;
                     addedAny = true;
                 }
             });

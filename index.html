@@ -224,6 +224,30 @@
             margin-top: 10px;
             display: none;
         }
+                /* Skeleton Loading Animation */
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .skeleton-box {
+            background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 8px;
+        }
+
+        .skeleton-loader {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .skeleton-line {
+            height: 44px;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -281,7 +305,13 @@
                 </select>
             </div>
 
-            <div id="pyq-loading" class="loading">Loading data from database...</div>
+                    <!-- Skeleton Loader Placeholder -->
+            <div id="pyq-loading" class="skeleton-loader">
+                <div class="skeleton-box skeleton-line"></div>
+                <div class="skeleton-box skeleton-line"></div>
+                <div class="skeleton-box skeleton-line"></div>
+            </div>
+            
 
             <div id="pyq-result" class="result-box">
                 <p id="paper-details" style="font-weight: 600; margin-bottom: 5px;"></p>
@@ -348,7 +378,7 @@
 
   async function fetchSheetData() {
     const loading = document.getElementById('pyq-loading');
-    if (loading) loading.style.display = 'block';
+    if (loading) loading.style.display = 'flex';
 
     try {
         // 1. Fetch PYQ Data first

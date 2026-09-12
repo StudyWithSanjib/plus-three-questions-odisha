@@ -16,7 +16,35 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="+3 PYQ & Syllabus Hub | Odisha Universities">
 <meta property="og:description" content="Free access to +3 NEP Syllabus & Previous Year Question Papers for Odisha Universities.">
-<meta property="og:url" content="https://studywithsanjib.github.io/plus-three-questions-odisha/"> 
+<meta property="og:url" content="https://studywithsanjib.github.io/plus-three-questions-odisha/">
+<meta property="og:image" content="https://studywithsanjib.github.io/plus-three-questions-odisha/preview.jpg">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="+3 PYQ & Syllabus Hub | Odisha Universities">
+<meta name="twitter:description" content="Free access to +3 NEP Syllabus & Previous Year Question Papers for Odisha Universities.">
+<meta name="twitter:image" content="https://studywithsanjib.github.io/plus-three-questions-odisha/preview.jpg">
+
+<!-- Canonical + Theme -->
+<link rel="canonical" href="https://studywithsanjib.github.io/plus-three-questions-odisha/">
+<meta name="theme-color" content="#4f46e5">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+
+<!-- JSON-LD structured data for search engines -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "+3 PYQ & Syllabus Hub",
+  "url": "https://studywithsanjib.github.io/plus-three-questions-odisha/",
+  "description": "Download +3 Odisha All Universities (NEP Model) Previous Year Question Papers (PYQ) and Syllabus for Arts, Science, and Commerce.",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Study With Sanjib"
+  }
+}
+</script>
     
     <style>
         :root {
@@ -29,6 +57,42 @@
             --border-color: #cbd5e1;
             --yt-red: #ff0000;
             --yt-red-hover: #cc0000;
+            --input-bg: #ffffff;
+            --result-bg: #f1f5f9;
+            --star-color: #cbd5e1;
+            --star-active: #f59e0b;
+        }
+
+        /* Dark Mode overrides - toggled via [data-theme="dark"] on <html> */
+        html[data-theme="dark"] {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --input-bg: #0f172a;
+            --result-bg: #0f172a;
+            --star-color: #475569;
+        }
+
+        html[data-theme="dark"] .skeleton-box {
+            background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+            background-size: 200% 100%;
+        }
+
+        html[data-theme="dark"] select,
+        html[data-theme="dark"] input,
+        html[data-theme="dark"] textarea {
+            background-color: var(--input-bg);
+            color: var(--text-main);
+        }
+
+        html {
+            transition: background-color 0.2s;
+        }
+
+        body, .container, select, input, .result-box, .no-data-msg {
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
         }
 
         * {
@@ -58,6 +122,13 @@
             margin-top: 10px;
         }
 
+        @media (min-width: 640px) {
+            .container {
+                max-width: 560px;
+                padding: 28px;
+            }
+        }
+
         header {
             text-align: center;
             margin-bottom: 20px;
@@ -73,6 +144,291 @@
             font-size: 0.85rem;
             color: var(--text-muted);
             margin-bottom: 10px;
+        }
+
+        /* Theme Toggle Switch */
+        .theme-toggle-wrap {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 4px;
+        }
+
+        .theme-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--result-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        /* Global Live Search */
+        .global-search-wrap {
+            position: relative;
+            margin-bottom: 18px;
+        }
+
+        .global-search-wrap input {
+            padding-left: 38px;
+        }
+
+        .global-search-wrap .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        .search-results {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            max-height: 280px;
+            overflow-y: auto;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            z-index: 50;
+        }
+
+        .search-result-item {
+            padding: 10px 12px;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-item:hover {
+            background: var(--result-bg);
+        }
+
+        .search-result-item .tag {
+            display: inline-block;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 6px;
+            color: #fff;
+        }
+
+        .tag.pyq { background: var(--primary); }
+        .tag.syllabus { background: #10b981; }
+
+        .search-no-results {
+            padding: 12px;
+            font-size: 0.8rem;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        /* Saved Papers section */
+        .saved-section {
+            display: none;
+            margin-bottom: 18px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .saved-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            background: var(--result-bg);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .saved-section-body {
+            display: none;
+            padding: 8px 12px;
+        }
+
+        .saved-section-body.open {
+            display: block;
+        }
+
+        .saved-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.8rem;
+        }
+
+        .saved-item:last-child {
+            border-bottom: none;
+        }
+
+        .saved-item-actions {
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .saved-item-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        /* Star / Bookmark button */
+        .star-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1.1rem;
+            width: 42px;
+            height: 42px;
+            cursor: pointer;
+            color: var(--star-color);
+            line-height: 1;
+        }
+
+        .star-btn.active {
+            color: var(--star-active);
+            border-color: var(--star-active);
+        }
+
+        /* Result box action row */
+        .result-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .result-actions .action-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 6px;
+            border: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            color: #fff;
+        }
+
+        .action-btn.preview-btn { background-color: #10b981; }
+        .action-btn.whatsapp-btn { background-color: #25D366; }
+        .action-btn.copy-btn { background-color: #64748b; }
+
+        .result-row {
+            display: flex;
+            gap: 8px;
+            align-items: stretch;
+        }
+
+        .result-row .result-actions {
+            flex: 1;
+            margin-top: 0;
+        }
+
+        /* PDF Preview Modal */
+        .pdf-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .pdf-modal-overlay.open {
+            display: flex;
+        }
+
+        .pdf-modal {
+            background: var(--card-bg);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 700px;
+            height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .pdf-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .pdf-modal-header h3 {
+            font-size: 0.9rem;
+            color: var(--text-main);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .pdf-modal-close {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            line-height: 1;
+            padding: 0 6px;
+        }
+
+        .pdf-modal-body {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .pdf-modal-body iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .pdf-modal-footer {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .pdf-modal-footer a {
+            display: block;
+            text-align: center;
+            padding: 12px;
+            background-color: var(--primary);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
         }
 
         /* YouTube Subscribe Button */
@@ -224,6 +580,59 @@
             margin-top: 10px;
             display: none;
         }
+
+        /* Error / empty states */
+        .error-box {
+            display: none;
+            text-align: center;
+            background: #fee2e2;
+            color: #b91c1c;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+
+        .error-box button {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 8px 16px;
+            background-color: #b91c1c;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .no-data-msg {
+            display: none;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: #f1f5f9;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 6px;
+        }
+
+        .reset-link {
+            display: block;
+            text-align: center;
+            margin-top: 14px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            background: none;
+            border: none;
+            text-decoration: underline;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .reset-link:hover {
+            color: var(--primary);
+        }
                 /* Skeleton Loading Animation */
         @keyframes shimmer {
             0% { background-position: -200% 0; }
@@ -253,6 +662,12 @@
 <body>
 
     <div class="container">
+        <div class="theme-toggle-wrap">
+            <button type="button" class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()">
+                <span id="theme-toggle-icon">🌙</span> <span id="theme-toggle-label">Dark Mode</span>
+            </button>
+        </div>
+
         <header>
             <h1>+3 PYQ & Syllabus Hub</h1>
             <p>Odisha Universities NEP Model Data</p>
@@ -260,6 +675,22 @@
                 ▶ Subscribe: Study With Sanjib
             </a>
         </header>
+
+        <!-- Global Live Search -->
+        <div class="global-search-wrap">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="global-search" placeholder="Search University, Subject or Paper..." autocomplete="off" oninput="handleGlobalSearch()" onfocus="handleGlobalSearch()">
+            <div id="search-results" class="search-results"></div>
+        </div>
+
+        <!-- Saved Papers -->
+        <div class="saved-section" id="saved-section">
+            <div class="saved-section-header" onclick="toggleSavedSection()">
+                <span>⭐ Saved Papers (<span id="saved-count">0</span>)</span>
+                <span id="saved-caret">▾</span>
+            </div>
+            <div class="saved-section-body" id="saved-section-body"></div>
+        </div>
 
         <!-- Navigation Tabs -->
         <div class="tabs">
@@ -279,47 +710,65 @@
                 <div class="skeleton-box skeleton-line"></div>
             </div>
 
+            <!-- Error state (dikhega agar fetch fail ho jaye) -->
+            <div id="pyq-error" class="error-box">
+                Data load nahi ho paya. Internet check karke phir try karein.
+                <br>
+                <button onclick="fetchSheetData(true)">Phir Try Karein</button>
+            </div>
+
             <!-- Main Form (Data aane ke baad hi show hoga) -->
             <div id="pyq-form-content" style="display: none;">
                 <div class="form-group">
-                    <label>1. Select University</label>
+                    <label for="uni-select">1. Select University</label>
                     <select id="uni-select" onchange="loadSubjects()">
                         <option value="">-- Choose University --</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label>2. Select Major Subject</label>
+                    <label for="sub-select">2. Select Major Subject</label>
                     <select id="sub-select" onchange="loadSemesters()" disabled>
                         <option value="">-- Choose Subject --</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label>3. Select Semester</label>
+                    <label for="sem-select">3. Select Semester</label>
                     <select id="sem-select" onchange="loadPapers()" disabled>
                         <option value="">-- Choose Semester --</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label>4. Select Paper</label>
+                    <label for="paper-select">4. Select Paper</label>
                     <select id="paper-select" onchange="loadYears()" disabled>
                         <option value="">-- Choose Paper --</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label>5. Select Year</label>
+                    <label for="year-select">5. Select Year</label>
                     <select id="year-select" onchange="showDownloadLink()" disabled>
                         <option value="">-- Choose Year --</option>
                     </select>
                 </div>
+
+                <div id="pyq-no-data" class="no-data-msg">Is combination ke liye koi paper available nahi hai.</div>
+
+                <button type="button" class="reset-link" onclick="resetPyqForm()">↺ Reset Selection</button>
             </div>
 
             <div id="pyq-result" class="result-box">
                 <p id="paper-details" style="font-weight: 600; margin-bottom: 5px;"></p>
-                <a id="download-btn" href="#" target="_blank">Download Question Paper</a>
+                <div class="result-row">
+                    <button type="button" class="action-btn preview-btn" style="flex:1;" onclick="openCurrentPreview('pyq')">📄 Preview & Download</button>
+                    <button type="button" class="star-btn" id="pyq-star-btn" onclick="toggleBookmark('pyq')" title="Save this paper">☆</button>
+                </div>
+                <div class="result-actions">
+                    <button type="button" class="action-btn whatsapp-btn" onclick="shareOnWhatsapp('pyq')">📲 Share</button>
+                    <button type="button" class="action-btn copy-btn" id="pyq-copy-btn" onclick="copyResultLink('pyq')">🔗 Copy Link</button>
+                </div>
             </div>
         </div>
         
@@ -334,33 +783,51 @@
                 <div class="skeleton-box skeleton-line"></div>
             </div>
 
+            <!-- Error state for Syllabus -->
+            <div id="syllabus-error" class="error-box">
+                Syllabus data load nahi ho paya. Internet check karke phir try karein.
+                <br>
+                <button onclick="fetchSyllabusData(true)">Phir Try Karein</button>
+            </div>
+
             <!-- Syllabus Form Content -->
             <div id="syllabus-form-content">
                 <div class="form-group">
-                    <label>1. Select Category</label>
+                    <label for="syllabus-category-select">1. Select Category</label>
                     <select id="syllabus-category-select" onchange="loadSyllabusSemesters()">
                         <option value="">-- Choose Category --</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label>2. Select Semester</label>
+                    <label for="syllabus-sem-select">2. Select Semester</label>
                     <select id="syllabus-sem-select" onchange="loadSyllabusSubjects()" disabled>
                         <option value="">-- Choose Semester --</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label>3. Select Subject</label>
+                    <label for="syllabus-sub-select">3. Select Subject</label>
                     <select id="syllabus-sub-select" onchange="showSyllabus()" disabled>
                         <option value="">-- Choose Subject --</option>
                     </select>
                 </div>
+
+                <div id="syllabus-no-data" class="no-data-msg">Is combination ke liye koi syllabus available nahi hai.</div>
+
+                <button type="button" class="reset-link" onclick="resetSyllabusForm()">↺ Reset Selection</button>
             </div>
 
             <div id="syllabus-result" class="result-box">
                 <p id="syllabus-details" style="font-weight: 600; margin-bottom: 5px;">NEP Model Syllabus PDF</p>
-                <a id="syllabus-download-btn" href="#" target="_blank">Download Syllabus PDF</a>
+                <div class="result-row">
+                    <button type="button" class="action-btn preview-btn" style="flex:1;" onclick="openCurrentPreview('syllabus')">📄 Preview & Download</button>
+                    <button type="button" class="star-btn" id="syllabus-star-btn" onclick="toggleBookmark('syllabus')" title="Save this syllabus">☆</button>
+                </div>
+                <div class="result-actions">
+                    <button type="button" class="action-btn whatsapp-btn" onclick="shareOnWhatsapp('syllabus')">📲 Share</button>
+                    <button type="button" class="action-btn copy-btn" id="syllabus-copy-btn" onclick="copyResultLink('syllabus')">🔗 Copy Link</button>
+                </div>
             </div>
         </div>
         
@@ -378,12 +845,366 @@
         </div>
     </div>
 
+    <!-- PDF Preview Modal -->
+    <div class="pdf-modal-overlay" id="pdf-modal-overlay" onclick="if(event.target===this) closePdfModal()">
+        <div class="pdf-modal">
+            <div class="pdf-modal-header">
+                <h3 id="pdf-modal-title">Preview</h3>
+                <button type="button" class="pdf-modal-close" onclick="closePdfModal()">&times;</button>
+            </div>
+            <div class="pdf-modal-body">
+                <iframe id="pdf-modal-iframe" src="" title="PDF Preview"></iframe>
+            </div>
+            <div class="pdf-modal-footer">
+                <a id="pdf-modal-download" href="#" target="_blank" rel="noopener">⬇ Download PDF</a>
+            </div>
+        </div>
+    </div>
+
     <script>
         const SHEETDB_URL = "https://script.google.com/macros/s/AKfycbyP-_UxuLc6cvWUTtkgD3wb--e5OUOeFitbO1V8iC8oNaVosTCDiUHsgTBPedDEwnLb/exec";
+        const CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes cache, so repeat visits load instantly
         let allData = [];
         let syllabusData = [];
 
             let isSyllabusLoaded = false;
+
+        // ----- Simple localStorage cache helpers -----
+        function getCache(key) {
+            try {
+                const raw = localStorage.getItem(key);
+                if (!raw) return null;
+                const parsed = JSON.parse(raw);
+                if (Date.now() - parsed.timestamp > CACHE_TTL_MS) return null;
+                return parsed.data;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function setCache(key, data) {
+            try {
+                localStorage.setItem(key, JSON.stringify({ timestamp: Date.now(), data }));
+            } catch (e) {
+                // Storage full or unavailable - safe to ignore, app still works
+            }
+        }
+
+        // ----- State for currently shown results (used by preview/share/bookmark) -----
+        let currentPyqResult = null;
+        let currentSyllabusResult = null;
+
+        /* ===================== 1. DARK / LIGHT MODE ===================== */
+        function initTheme() {
+            const saved = localStorage.getItem('theme-preference');
+            const theme = saved || 'light';
+            applyTheme(theme);
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            const icon = document.getElementById('theme-toggle-icon');
+            const label = document.getElementById('theme-toggle-label');
+            if (theme === 'dark') {
+                icon.textContent = '☀️';
+                label.textContent = 'Light Mode';
+            } else {
+                icon.textContent = '🌙';
+                label.textContent = 'Dark Mode';
+            }
+        }
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+            const next = current === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme-preference', next);
+            applyTheme(next);
+        }
+
+        /* ===================== 2. GLOBAL LIVE SEARCH ===================== */
+        function handleGlobalSearch() {
+            const query = document.getElementById('global-search').value.trim().toLowerCase();
+            const resultsBox = document.getElementById('search-results');
+
+            if (!query) {
+                resultsBox.style.display = 'none';
+                resultsBox.innerHTML = '';
+                return;
+            }
+
+            const matches = [];
+
+            // Search across PYQ data (university, subject, paper name)
+            allData.forEach(item => {
+                const haystack = `${item.university || ''} ${item.subject || ''} ${item.papername || ''}`.toLowerCase();
+                if (haystack.includes(query) && item.drivelink) {
+                    matches.push({
+                        type: 'pyq',
+                        label: `${item.papername || item.subject} — ${item.university} (${item.semester || ''} ${item.year || ''})`,
+                        data: item
+                    });
+                }
+            });
+
+            // Search across Syllabus data (category, subject)
+            if (Array.isArray(syllabusData)) {
+                syllabusData.forEach(item => {
+                    const category = getSyllabusField(item, ['Category', 'category']);
+                    const semester = getSyllabusField(item, ['Semester', 'semester']);
+                    const subjectName = getSyllabusField(item, ['SubjectName', 'Subject Name', 'subjectname', 'subject']);
+                    const driveLink = getSyllabusField(item, ['DriveLink', 'Drive Link', 'drivelink']);
+                    const haystack = `${category} ${semester} ${subjectName}`.toLowerCase();
+                    if (haystack.includes(query) && driveLink) {
+                        matches.push({
+                            type: 'syllabus',
+                            label: `${subjectName} — ${category} (${semester})`,
+                            data: { category, semester, subjectName, driveLink }
+                        });
+                    }
+                });
+            }
+
+            resultsBox.innerHTML = '';
+
+            if (matches.length === 0) {
+                resultsBox.innerHTML = '<div class="search-no-results">Koi result nahi mila.</div>';
+                resultsBox.style.display = 'block';
+                return;
+            }
+
+            matches.slice(0, 15).forEach((m, idx) => {
+                const div = document.createElement('div');
+                div.className = 'search-result-item';
+                div.innerHTML = `<span class="tag ${m.type}">${m.type === 'pyq' ? 'PYQ' : 'SYLLABUS'}</span>${m.label}`;
+                div.onclick = () => selectSearchResult(m);
+                resultsBox.appendChild(div);
+            });
+
+            resultsBox.style.display = 'block';
+        }
+
+        function selectSearchResult(match) {
+            document.getElementById('search-results').style.display = 'none';
+            document.getElementById('global-search').value = '';
+
+            if (match.type === 'pyq') {
+                switchToTab('download-pyq');
+                const item = match.data;
+                const uniSelect = document.getElementById('uni-select');
+                uniSelect.value = item.university;
+                loadSubjects();
+                document.getElementById('sub-select').value = item.subject;
+                loadSemesters();
+                document.getElementById('sem-select').value = item.semester;
+                loadPapers();
+                document.getElementById('paper-select').value = item.papername;
+                loadYears();
+                document.getElementById('year-select').value = item.drivelink;
+                showDownloadLink();
+                document.getElementById('pyq-result').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                switchToTab('download-syllabus');
+                fetchSyllabusData().then(() => {
+                    const item = match.data;
+                    document.getElementById('syllabus-category-select').value = item.category;
+                    loadSyllabusSemesters();
+                    document.getElementById('syllabus-sem-select').value = item.semester;
+                    loadSyllabusSubjects();
+                    document.getElementById('syllabus-sub-select').value = item.driveLink;
+                    showSyllabus();
+                    document.getElementById('syllabus-result').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                });
+            }
+        }
+
+        // Programmatically switch tabs (used by search) without relying on a click event
+        function switchToTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            const btnIndex = tabId === 'download-pyq' ? 0 : (tabId === 'download-syllabus' ? 1 : 2);
+            document.querySelectorAll('.tab-btn')[btnIndex].classList.add('active');
+        }
+
+        // Close search dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const wrap = document.querySelector('.global-search-wrap');
+            if (wrap && !wrap.contains(e.target)) {
+                document.getElementById('search-results').style.display = 'none';
+            }
+        });
+
+        /* ===================== 3. IN-APP PDF PREVIEW MODAL ===================== */
+        // Converts a normal Google Drive share link into embeddable preview + direct download URLs
+        function getDriveFileId(url) {
+            if (!url) return null;
+            let match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+            if (match) return match[1];
+            match = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+            if (match) return match[1];
+            return null;
+        }
+
+        function getPreviewUrl(url) {
+            const fileId = getDriveFileId(url);
+            if (fileId) return `https://drive.google.com/file/d/${fileId}/preview`;
+            return url;
+        }
+
+        function getDownloadUrl(url) {
+            const fileId = getDriveFileId(url);
+            if (fileId) return `https://drive.google.com/uc?export=download&id=${fileId}`;
+            return url;
+        }
+
+        function openPdfModal(url, title) {
+            document.getElementById('pdf-modal-title').textContent = title || 'Preview';
+            document.getElementById('pdf-modal-iframe').src = getPreviewUrl(url);
+            document.getElementById('pdf-modal-download').href = getDownloadUrl(url);
+            document.getElementById('pdf-modal-overlay').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePdfModal() {
+            document.getElementById('pdf-modal-overlay').classList.remove('open');
+            document.getElementById('pdf-modal-iframe').src = '';
+            document.body.style.overflow = '';
+        }
+
+        function openCurrentPreview(type) {
+            const result = type === 'pyq' ? currentPyqResult : currentSyllabusResult;
+            if (result) openPdfModal(result.url, result.title);
+        }
+
+        /* ===================== 4. WHATSAPP SHARE & COPY LINK ===================== */
+        function shareOnWhatsapp(type) {
+            const result = type === 'pyq' ? currentPyqResult : currentSyllabusResult;
+            if (!result) return;
+            const text = encodeURIComponent(`${result.title}\n${result.url}\n\nvia +3 PYQ & Syllabus Hub`);
+            window.open(`https://wa.me/?text=${text}`, '_blank');
+        }
+
+        function copyResultLink(type) {
+            const result = type === 'pyq' ? currentPyqResult : currentSyllabusResult;
+            if (!result) return;
+            const btn = document.getElementById(type + '-copy-btn');
+            const original = btn.innerHTML;
+
+            const doFeedback = () => {
+                btn.innerHTML = '✅ Copied!';
+                setTimeout(() => { btn.innerHTML = original; }, 1500);
+            };
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(result.url).then(doFeedback).catch(doFeedback);
+            } else {
+                // Fallback for older browsers
+                const temp = document.createElement('textarea');
+                temp.value = result.url;
+                document.body.appendChild(temp);
+                temp.select();
+                try { document.execCommand('copy'); } catch (e) {}
+                document.body.removeChild(temp);
+                doFeedback();
+            }
+        }
+
+        /* ===================== 5. BOOKMARKS / SAVED PAPERS ===================== */
+        function getSavedPapers() {
+            try {
+                const raw = localStorage.getItem('saved-papers');
+                return raw ? JSON.parse(raw) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function setSavedPapers(list) {
+            try {
+                localStorage.setItem('saved-papers', JSON.stringify(list));
+            } catch (e) {}
+        }
+
+        function isBookmarked(id) {
+            return getSavedPapers().some(item => item.id === id);
+        }
+
+        function updateStarState(type) {
+            const result = type === 'pyq' ? currentPyqResult : currentSyllabusResult;
+            const btn = document.getElementById(type + '-star-btn');
+            if (!result || !btn) return;
+            if (isBookmarked(result.id)) {
+                btn.textContent = '★';
+                btn.classList.add('active');
+            } else {
+                btn.textContent = '☆';
+                btn.classList.remove('active');
+            }
+        }
+
+        function toggleBookmark(type) {
+            const result = type === 'pyq' ? currentPyqResult : currentSyllabusResult;
+            if (!result) return;
+
+            let list = getSavedPapers();
+            const exists = list.some(item => item.id === result.id);
+
+            if (exists) {
+                list = list.filter(item => item.id !== result.id);
+            } else {
+                list.unshift(result);
+            }
+
+            setSavedPapers(list);
+            updateStarState(type);
+            renderSavedPapers();
+        }
+
+        function removeSavedPaper(id) {
+            let list = getSavedPapers().filter(item => item.id !== id);
+            setSavedPapers(list);
+            renderSavedPapers();
+            updateStarState('pyq');
+            updateStarState('syllabus');
+        }
+
+        function renderSavedPapers() {
+            const list = getSavedPapers();
+            const section = document.getElementById('saved-section');
+            const body = document.getElementById('saved-section-body');
+            const count = document.getElementById('saved-count');
+
+            count.textContent = list.length;
+
+            if (list.length === 0) {
+                section.style.display = 'none';
+                body.innerHTML = '';
+                return;
+            }
+
+            section.style.display = 'block';
+            body.innerHTML = '';
+
+            list.forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'saved-item';
+                row.innerHTML = `
+                    <span>${item.type === 'pyq' ? '📄' : '📘'} ${item.title}</span>
+                    <span class="saved-item-actions">
+                        <button title="Preview" onclick='openPdfModal(${JSON.stringify(item.url)}, ${JSON.stringify(item.title)})'>👁️</button>
+                        <button title="Remove" onclick='removeSavedPaper(${JSON.stringify(item.id)})'>🗑️</button>
+                    </span>
+                `;
+                body.appendChild(row);
+            });
+        }
+
+        function toggleSavedSection() {
+            const body = document.getElementById('saved-section-body');
+            const caret = document.getElementById('saved-caret');
+            body.classList.toggle('open');
+            caret.textContent = body.classList.contains('open') ? '▴' : '▾';
+        }
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -398,44 +1219,82 @@
             }
         }
 
-        async function fetchSheetData() {
+        async function fetchSheetData(forceRefresh) {
             const loading = document.getElementById('pyq-loading');
             const formContent = document.getElementById('pyq-form-content');
+            const errorBox = document.getElementById('pyq-error');
 
-            if (loading) loading.style.display = 'flex';
-            if (formContent) formContent.style.display = 'none';
+            errorBox.style.display = 'none';
+
+            // Use cached data if fresh and not a manual retry
+            if (!forceRefresh) {
+                const cached = getCache('pyq-data');
+                if (cached) {
+                    allData = cached;
+                    populateUniversities();
+                    loading.style.display = 'none';
+                    formContent.style.display = 'block';
+                    return;
+                }
+            }
+
+            loading.style.display = 'flex';
+            formContent.style.display = 'none';
 
             try {
                 let response = await fetch(SHEETDB_URL);
+                if (!response.ok) throw new Error('Network response was not ok');
                 allData = await response.json();
+                setCache('pyq-data', allData);
                 populateUniversities();
+                loading.style.display = 'none';
+                formContent.style.display = 'block';
             } catch (error) {
                 console.error("Error fetching PYQ data:", error);
-            } finally {
-                if (loading) loading.style.display = 'none';
-                if (formContent) formContent.style.display = 'block';
+                loading.style.display = 'none';
+                formContent.style.display = 'none';
+                errorBox.style.display = 'block';
             }
         }
 
-                async function fetchSyllabusData() {
-            if (isSyllabusLoaded) return;
+                async function fetchSyllabusData(forceRefresh) {
+            if (isSyllabusLoaded && !forceRefresh) return;
 
             const loading = document.getElementById('syllabus-loading');
             const formContent = document.getElementById('syllabus-form-content');
+            const errorBox = document.getElementById('syllabus-error');
 
-            if (loading) loading.style.display = 'flex';
-            if (formContent) formContent.style.display = 'none';
+            errorBox.style.display = 'none';
+
+            if (!forceRefresh) {
+                const cached = getCache('syllabus-data');
+                if (cached) {
+                    syllabusData = cached;
+                    populateSyllabus();
+                    isSyllabusLoaded = true;
+                    loading.style.display = 'none';
+                    formContent.style.display = 'block';
+                    return;
+                }
+            }
+
+            loading.style.display = 'flex';
+            formContent.style.display = 'none';
 
             try {
                 let syllabusResponse = await fetch(SHEETDB_URL + "?sheet=Syllabus");
+                if (!syllabusResponse.ok) throw new Error('Network response was not ok');
                 syllabusData = await syllabusResponse.json();
+                setCache('syllabus-data', syllabusData);
                 populateSyllabus();
                 isSyllabusLoaded = true;
+                loading.style.display = 'none';
+                formContent.style.display = 'block';
             } catch (error) {
                 console.error("Error fetching Syllabus data:", error);
-            } finally {
-                if (loading) loading.style.display = 'none';
-                if (formContent) formContent.style.display = 'block';
+                loading.style.display = 'none';
+                formContent.style.display = 'none';
+                errorBox.style.display = 'block';
             }
                 }
         
@@ -503,12 +1362,18 @@
             document.getElementById('year-select').disabled = true;
             document.getElementById('pyq-result').style.display = 'none';
 
+            document.getElementById('pyq-no-data').style.display = 'none';
+
             if(sem) {
                 let papers = [...new Set(allData.filter(item => 
                     item.university === uni && 
                     item.subject === sub && 
                     item.semester === sem
                 ).map(item => item.papername))];
+
+                if (papers.filter(Boolean).length === 0) {
+                    document.getElementById('pyq-no-data').style.display = 'block';
+                }
 
                 papers.forEach(p => {
                     if(p) paperSelect.innerHTML += `<option value="${p}">${p}</option>`;
@@ -527,34 +1392,48 @@
             yearSelect.disabled = !paper;
             document.getElementById('pyq-result').style.display = 'none';
 
+            document.getElementById('pyq-no-data').style.display = 'none';
+
             if(paper) {
                 let yearData = allData.filter(item => 
                     item.university === uni && 
                     item.subject === sub && 
                     item.semester === sem &&
                     item.papername === paper
-                );
+                ).filter(item => item.year && item.drivelink);
+
+                // Latest year pehle dikhana (descending order)
+                yearData.sort((a, b) => String(b.year).localeCompare(String(a.year), undefined, { numeric: true }));
+
+                if (yearData.length === 0) {
+                    document.getElementById('pyq-no-data').style.display = 'block';
+                }
 
                 yearData.forEach(item => {
-                    if(item.year && item.drivelink) {
-                        yearSelect.innerHTML += `<option value="${item.drivelink}">${item.year}</option>`;
-                    }
+                    yearSelect.innerHTML += `<option value="${item.drivelink}">${item.year}</option>`;
                 });
             }
+        }
+
+        function resetPyqForm() {
+            document.getElementById('uni-select').selectedIndex = 0;
+            loadSubjects();
         }
 
         function showDownloadLink() {
             let select = document.getElementById('year-select');
             let linkBox = document.getElementById('pyq-result');
-            let downloadBtn = document.getElementById('download-btn');
             let details = document.getElementById('paper-details');
             let paperSelect = document.getElementById('paper-select');
 
             if(select.value) {
-                downloadBtn.href = select.value;
-                details.innerText = paperSelect.options[paperSelect.selectedIndex].text + " (" + select.options[select.selectedIndex].text + ")";
+                const title = paperSelect.options[paperSelect.selectedIndex].text + " (" + select.options[select.selectedIndex].text + ")";
+                details.innerText = title;
+                currentPyqResult = { id: 'pyq:' + select.value, title: title, url: select.value, type: 'pyq' };
+                updateStarState('pyq');
                 linkBox.style.display = 'block';
             } else {
+                currentPyqResult = null;
                 linkBox.style.display = 'none';
             }
         }
@@ -633,6 +1512,8 @@
             subSelect.disabled = !semester;
             document.getElementById('syllabus-result').style.display = 'none';
 
+            document.getElementById('syllabus-no-data').style.display = 'none';
+
             if (!semester) return;
 
             const subjects = syllabusData.filter(item =>
@@ -640,6 +1521,7 @@
                 getSyllabusField(item, ['Semester', 'semester']) === semester
             );
 
+            let addedAny = false;
             subjects.forEach(item => {
                 const subjectName = getSyllabusField(item, ['SubjectName', 'Subject Name', 'subjectname', 'subject']);
                 const driveLink = getSyllabusField(item, ['DriveLink', 'Drive Link', 'drivelink']);
@@ -648,32 +1530,46 @@
                     // Store the DriveLink as the option value so the selected
                     // subject always opens its own syllabus PDF.
                     subSelect.innerHTML += `<option value="${driveLink}">${subjectName}</option>`;
+                    addedAny = true;
                 }
             });
+
+            if (!addedAny) {
+                document.getElementById('syllabus-no-data').style.display = 'block';
+            }
+        }
+
+        function resetSyllabusForm() {
+            document.getElementById('syllabus-category-select').selectedIndex = 0;
+            loadSyllabusSemesters();
         }
 
         function showSyllabus() {
             const select = document.getElementById('syllabus-sub-select');
             const resBox = document.getElementById('syllabus-result');
-            const btn = document.getElementById('syllabus-download-btn');
             const details = document.getElementById('syllabus-details');
 
             if (select.value) {
-                btn.href = select.value;
-
                 const category = document.getElementById('syllabus-category-select').value;
                 const semester = document.getElementById('syllabus-sem-select').value;
                 const subject = select.options[select.selectedIndex].text;
+                const title = `${category} • ${semester} • ${subject} Model Syllabus PDF`;
 
-                details.innerText = `${category} • ${semester} • ${subject} Model Syllabus PDF`;
+                details.innerText = title;
+                currentSyllabusResult = { id: 'syllabus:' + select.value, title: title, url: select.value, type: 'syllabus' };
+                updateStarState('syllabus');
                 resBox.style.display = 'block';
             } else {
+                currentSyllabusResult = null;
                 resBox.style.display = 'none';
             }
         }
 
-        window.onload = fetchSheetData;
+        window.onload = function() {
+            initTheme();
+            renderSavedPapers();
+            fetchSheetData();
+        };
     </script>
 </body>
 </html>
-

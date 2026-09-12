@@ -268,56 +268,61 @@
             <button class="tab-btn" onclick="switchTab('upload-pyq')">Upload PYQ</button>
         </div>
 
-        <!-- TAB 1: Download PYQ -->
+            <!-- TAB 1: Download PYQ -->
         <div id="download-pyq" class="tab-content active">
-            <div class="form-group">
-                <label>1. Select University</label>
-                <select id="uni-select" onchange="loadSubjects()">
-                    <option value="">-- Choose University --</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>2. Select Major Subject</label>
-                <select id="sub-select" onchange="loadSemesters()" disabled>
-                    <option value="">-- Choose Subject --</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>3. Select Semester</label>
-                <select id="sem-select" onchange="loadPapers()" disabled>
-                    <option value="">-- Choose Semester --</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>4. Select Paper</label>
-                <select id="paper-select" onchange="loadYears()" disabled>
-                    <option value="">-- Choose Paper --</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>5. Select Year</label>
-                <select id="year-select" onchange="showDownloadLink()" disabled>
-                    <option value="">-- Choose Year --</option>
-                </select>
-            </div>
-
-                    <!-- Skeleton Loader Placeholder -->
+            <!-- Skeleton Loader (Pehle 5 shimmer bars dikhenge) -->
             <div id="pyq-loading" class="skeleton-loader">
                 <div class="skeleton-box skeleton-line"></div>
                 <div class="skeleton-box skeleton-line"></div>
                 <div class="skeleton-box skeleton-line"></div>
+                <div class="skeleton-box skeleton-line"></div>
+                <div class="skeleton-box skeleton-line"></div>
             </div>
-            
+
+            <!-- Main Form (Data aane ke baad hi show hoga) -->
+            <div id="pyq-form-content" style="display: none;">
+                <div class="form-group">
+                    <label>1. Select University</label>
+                    <select id="uni-select" onchange="loadSubjects()">
+                        <option value="">-- Choose University --</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>2. Select Major Subject</label>
+                    <select id="sub-select" onchange="loadSemesters()" disabled>
+                        <option value="">-- Choose Subject --</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>3. Select Semester</label>
+                    <select id="sem-select" onchange="loadPapers()" disabled>
+                        <option value="">-- Choose Semester --</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>4. Select Paper</label>
+                    <select id="paper-select" onchange="loadYears()" disabled>
+                        <option value="">-- Choose Paper --</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>5. Select Year</label>
+                    <select id="year-select" onchange="showDownloadLink()" disabled>
+                        <option value="">-- Choose Year --</option>
+                    </select>
+                </div>
+            </div>
 
             <div id="pyq-result" class="result-box">
                 <p id="paper-details" style="font-weight: 600; margin-bottom: 5px;"></p>
                 <a id="download-btn" href="#" target="_blank">Download Question Paper</a>
             </div>
         </div>
+        
 
         <!-- TAB 2: Download Syllabus (DYNAMIC FROM SHEET) -->
         <div id="download-syllabus" class="tab-content">
@@ -376,9 +381,12 @@
             }
         }
 
-  async function fetchSheetData() {
+    async function fetchSheetData() {
     const loading = document.getElementById('pyq-loading');
+    const formContent = document.getElementById('pyq-form-content');
+
     if (loading) loading.style.display = 'flex';
+    if (formContent) formContent.style.display = 'none';
 
     try {
         // 1. Fetch PYQ Data first
@@ -395,8 +403,10 @@
         console.error("Error fetching data:", error);
     } finally {
         if (loading) loading.style.display = 'none';
+        if (formContent) formContent.style.display = 'block';
     }
-  }
+                }
+            
         
         
 

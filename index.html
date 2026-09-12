@@ -323,30 +323,39 @@
             </div>
         </div>
         
-
         <!-- TAB 2: Download Syllabus (DYNAMIC FROM SHEET) -->
         <div id="download-syllabus" class="tab-content">
             <div class="note">Note: As per NEP 2020, the Model Syllabus is mostly common across all state universities.</div>
 
-            <div class="form-group">
-                <label>1. Select Category</label>
-                <select id="syllabus-category-select" onchange="loadSyllabusSemesters()">
-                    <option value="">-- Choose Category --</option>
-                </select>
+            <!-- Skeleton Loader for Syllabus -->
+            <div id="syllabus-loading" class="skeleton-loader" style="display: none;">
+                <div class="skeleton-box skeleton-line"></div>
+                <div class="skeleton-box skeleton-line"></div>
+                <div class="skeleton-box skeleton-line"></div>
             </div>
 
-            <div class="form-group">
-                <label>2. Select Semester</label>
-                <select id="syllabus-sem-select" onchange="loadSyllabusSubjects()" disabled>
-                    <option value="">-- Choose Semester --</option>
-                </select>
-            </div>
+            <!-- Syllabus Form Content -->
+            <div id="syllabus-form-content">
+                <div class="form-group">
+                    <label>1. Select Category</label>
+                    <select id="syllabus-category-select" onchange="loadSyllabusSemesters()">
+                        <option value="">-- Choose Category --</option>
+                    </select>
+                </div>
 
-            <div class="form-group">
-                <label>3. Select Subject</label>
-                <select id="syllabus-sub-select" onchange="showSyllabus()" disabled>
-                    <option value="">-- Choose Subject --</option>
-                </select>
+                <div class="form-group">
+                    <label>2. Select Semester</label>
+                    <select id="syllabus-sem-select" onchange="loadSyllabusSubjects()" disabled>
+                        <option value="">-- Choose Semester --</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>3. Select Subject</label>
+                    <select id="syllabus-sub-select" onchange="showSyllabus()" disabled>
+                        <option value="">-- Choose Subject --</option>
+                    </select>
+                </div>
             </div>
 
             <div id="syllabus-result" class="result-box">
@@ -354,6 +363,8 @@
                 <a id="syllabus-download-btn" href="#" target="_blank">Download Syllabus PDF</a>
             </div>
         </div>
+        
+   
 
         <!-- TAB 3: Upload PYQ -->
         <div id="upload-pyq" class="tab-content">
@@ -406,8 +417,14 @@
             }
         }
 
-        async function fetchSyllabusData() {
+                async function fetchSyllabusData() {
             if (isSyllabusLoaded) return;
+
+            const loading = document.getElementById('syllabus-loading');
+            const formContent = document.getElementById('syllabus-form-content');
+
+            if (loading) loading.style.display = 'flex';
+            if (formContent) formContent.style.display = 'none';
 
             try {
                 let syllabusResponse = await fetch(SHEETDB_URL + "?sheet=Syllabus");
@@ -416,8 +433,12 @@
                 isSyllabusLoaded = true;
             } catch (error) {
                 console.error("Error fetching Syllabus data:", error);
+            } finally {
+                if (loading) loading.style.display = 'none';
+                if (formContent) formContent.style.display = 'block';
             }
-        }
+                }
+        
         
             
         

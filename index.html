@@ -844,7 +844,7 @@
 
             <!-- TAB 1: Download PYQ -->
         <div id="download-pyq" class="tab-content active">
-            <!-- Skeleton Loader (Pehle 5 shimmer bars dikhenge) -->
+            <!-- Skeleton Loader (5 shimmer bars shown first while data loads) -->
             <div id="pyq-loading" class="skeleton-loader">
                 <div class="skeleton-box skeleton-line"></div>
                 <div class="skeleton-box skeleton-line"></div>
@@ -853,14 +853,14 @@
                 <div class="skeleton-box skeleton-line"></div>
             </div>
 
-            <!-- Error state (dikhega agar fetch fail ho jaye) -->
+            <!-- Error state (shown if the fetch fails) -->
             <div id="pyq-error" class="error-box">
-                Data load nahi ho paya. Internet check karke phir try karein.
+                Failed to load data. Please check your internet connection and try again.
                 <br>
-                <button onclick="fetchSheetData(true)">Phir Try Karein</button>
+                <button onclick="fetchSheetData(true)">Try Again</button>
             </div>
 
-            <!-- Main Form (Data aane ke baad hi show hoga) -->
+            <!-- Main Form (only shown once data has loaded) -->
             <div id="pyq-form-content" style="display: none;">
                 <div class="form-group">
                     <label for="uni-select">1. Select University</label>
@@ -897,7 +897,7 @@
                     </select>
                 </div>
 
-                <div id="pyq-no-data" class="no-data-msg">Is combination ke liye koi paper available nahi hai.</div>
+                <div id="pyq-no-data" class="no-data-msg">No paper available for this combination.</div>
 
                 <button type="button" class="reset-link" onclick="resetPyqForm()">↺ Reset Selection</button>
             </div>
@@ -928,9 +928,9 @@
 
             <!-- Error state for Syllabus -->
             <div id="syllabus-error" class="error-box">
-                Syllabus data load nahi ho paya. Internet check karke phir try karein.
+                Failed to load syllabus data. Please check your internet connection and try again.
                 <br>
-                <button onclick="fetchSyllabusData(true)">Phir Try Karein</button>
+                <button onclick="fetchSyllabusData(true)">Try Again</button>
             </div>
 
             <!-- Syllabus Form Content -->
@@ -956,7 +956,7 @@
                     </select>
                 </div>
 
-                <div id="syllabus-no-data" class="no-data-msg">Is combination ke liye koi syllabus available nahi hai.</div>
+                <div id="syllabus-no-data" class="no-data-msg">No syllabus available for this combination.</div>
 
                 <button type="button" class="reset-link" onclick="resetSyllabusForm()">↺ Reset Selection</button>
             </div>
@@ -1127,7 +1127,7 @@
             resultsBox.innerHTML = '';
 
             if (matches.length === 0) {
-                resultsBox.innerHTML = '<div class="search-no-results">Koi result nahi mila.</div>';
+                resultsBox.innerHTML = '<div class="search-no-results">No results found.</div>';
                 resultsBox.style.display = 'block';
                 return;
             }
@@ -1562,7 +1562,7 @@
                     item.papername === paper
                 ).filter(item => item.year && item.drivelink);
 
-                // Latest year pehle dikhana (descending order)
+                // Show latest year first (descending order)
                 yearData.sort((a, b) => String(b.year).localeCompare(String(a.year), undefined, { numeric: true }));
 
                 if (yearData.length === 0) {

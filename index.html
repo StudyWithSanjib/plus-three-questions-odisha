@@ -28,6 +28,7 @@
 <!-- Canonical + Theme -->
 <link rel="canonical" href="https://studywithsanjib.github.io/plus-three-questions-odisha/">
 <meta name="theme-color" content="#4f46e5">
+<link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="favicon.png">
 
@@ -45,6 +46,89 @@
   }
 }
 </script>
+
+<!-- FAQ structured data - helps this page qualify for Google's FAQ rich results -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How do I download +3 Previous Year Question Papers (PYQ) for Odisha Universities?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Open the Download PYQ tab, then select your University, Subject, Semester, Paper and Year in order. The matching question paper PDF link will appear for preview and download."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is the +3 NEP Model Syllabus the same for all Odisha universities?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Under NEP 2020, the Model Syllabus is largely common across Odisha state universities including Kalahandi University. Minor variations may exist, so always cross-check with your college."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I request a question paper that is not available on this website?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Use the Request PYQ link in the side menu to submit a request form, and the team will try to add it once available."
+      }
+    }
+  ]
+}
+</script>
+
+<!-- Breadcrumb structured data - helps Google show a breadcrumb trail in search
+     results instead of a raw URL, and clarifies the site's section structure. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://studywithsanjib.github.io/plus-three-questions-odisha/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Download PYQ",
+      "item": "https://studywithsanjib.github.io/plus-three-questions-odisha/#download-pyq"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Download Syllabus",
+      "item": "https://studywithsanjib.github.io/plus-three-questions-odisha/#download-syllabus"
+    }
+  ]
+}
+</script>
+
+<!-- Crawling & Indexing Control -->
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<meta name="bingbot" content="index, follow">
+
+<!-- Speed Optimization (Apps Script & Drive Preview Fast Karne Ke Liye) -->
+<!-- dns-prefetch is a fallback for older browsers; preconnect (with crossorigin,
+     since these are fetch()/iframe requests) does the fuller DNS+TLS handshake
+     ahead of time on modern browsers, shaving real time off the first request. -->
+<link rel="dns-prefetch" href="https://script.google.com">
+<link rel="preconnect" href="https://script.google.com" crossorigin>
+<link rel="dns-prefetch" href="https://drive.google.com">
+<link rel="preconnect" href="https://drive.google.com" crossorigin>
+
+<!-- Geo / Local SEO (Odisha Search Targetting) -->
+<meta name="geo.region" content="IN-OR">
+<meta name="geo.placename" content="Odisha, India">
+<meta name="geo.position" content="20.9517;85.0985">
+<meta name="ICBM" content="20.9517, 85.0985">
     
     <style>
         :root {
@@ -755,6 +839,40 @@
         .reset-link:hover {
             color: var(--primary);
         }
+
+        /* Shown when live data is unreachable but a cached copy is used instead */
+        .stale-notice {
+            font-size: 0.75rem;
+            color: #92400e;
+            background: #fef3c7;
+            padding: 8px 10px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+
+        /* Persistent top banner shown while the browser reports it is offline */
+        .offline-banner {
+            display: none;
+            width: 100%;
+            max-width: 480px;
+            background: #1e293b;
+            color: #f1f5f9;
+            text-align: center;
+            font-size: 0.8rem;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .offline-banner.show {
+            display: block;
+        }
+
+        @media (min-width: 640px) {
+            .offline-banner {
+                max-width: 560px;
+            }
+        }
                 /* Skeleton Loading Animation */
         @keyframes shimmer {
             0% { background-position: -200% 0; }
@@ -800,10 +918,11 @@
             <a href="privacy-policy.html"><span class="menu-icon">🔒</span> Privacy Policy</a>
             <a href="disclaimer.html"><span class="menu-icon">⚠️</span> Disclaimer</a>
         </nav>
-        <div class="menu-drawer-footer">© 2026 Study With Sanjib. All Rights Reserved.</div>
+        <div class="menu-drawer-footer">© <span id="footer-year">2026</span> Study With Sanjib. All Rights Reserved.</div>
     </div>
 
     <div class="container">
+        <div class="offline-banner" id="offline-banner" role="status" aria-live="polite">📴 You're offline — showing saved data where available.</div>
         <div class="top-bar">
             <button type="button" class="hamburger-btn" id="hamburger-btn" onclick="openMenu()" aria-label="Open menu">☰</button>
             <button type="button" class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle dark mode">
@@ -823,7 +942,7 @@
         <div class="global-search-wrap">
             <span class="search-icon">🔍</span>
             <input type="text" id="global-search" placeholder="Search University, Subject or Paper..." autocomplete="off" oninput="handleGlobalSearch()" onfocus="handleGlobalSearch()">
-            <div id="search-results" class="search-results"></div>
+            <div id="search-results" class="search-results" role="listbox" aria-live="polite"></div>
         </div>
 
         <!-- Saved Papers -->
@@ -836,14 +955,14 @@
         </div>
 
         <!-- Navigation Tabs -->
-        <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('download-pyq', event)">Download PYQ</button>
-            <button class="tab-btn" onclick="switchTab('download-syllabus', event)">Download Syllabus</button>
-            <button class="tab-btn" onclick="switchTab('upload-pyq', event)">Upload PYQ</button>
+        <div class="tabs" role="tablist" aria-label="Site sections">
+            <button class="tab-btn active" role="tab" id="tab-btn-pyq" aria-selected="true" aria-controls="download-pyq" onclick="switchTab('download-pyq', event)">Download PYQ</button>
+            <button class="tab-btn" role="tab" id="tab-btn-syllabus" aria-selected="false" aria-controls="download-syllabus" onclick="switchTab('download-syllabus', event)">Download Syllabus</button>
+            <button class="tab-btn" role="tab" id="tab-btn-upload" aria-selected="false" aria-controls="upload-pyq" onclick="switchTab('upload-pyq', event)">Upload PYQ</button>
         </div>
 
             <!-- TAB 1: Download PYQ -->
-        <div id="download-pyq" class="tab-content active">
+        <div id="download-pyq" class="tab-content active" role="tabpanel" aria-labelledby="tab-btn-pyq">
             <!-- Skeleton Loader (5 shimmer bars shown first while data loads) -->
             <div id="pyq-loading" class="skeleton-loader">
                 <div class="skeleton-box skeleton-line"></div>
@@ -854,8 +973,8 @@
             </div>
 
             <!-- Error state (shown if the fetch fails) -->
-            <div id="pyq-error" class="error-box">
-                Failed to load data. Please check your internet connection and try again.
+            <div id="pyq-error" class="error-box" role="alert" aria-live="assertive">
+                <span id="pyq-error-msg">Failed to load data. Please check your internet connection and try again.</span>
                 <br>
                 <button onclick="fetchSheetData(true)">Try Again</button>
             </div>
@@ -897,7 +1016,7 @@
                     </select>
                 </div>
 
-                <div id="pyq-no-data" class="no-data-msg">No paper available for this combination.</div>
+                <div id="pyq-no-data" class="no-data-msg" role="status" aria-live="polite">No paper available for this combination.</div>
 
                 <button type="button" class="reset-link" onclick="resetPyqForm()">↺ Reset Selection</button>
             </div>
@@ -916,7 +1035,7 @@
         </div>
         
         <!-- TAB 2: Download Syllabus (DYNAMIC FROM SHEET) -->
-        <div id="download-syllabus" class="tab-content">
+        <div id="download-syllabus" class="tab-content" role="tabpanel" aria-labelledby="tab-btn-syllabus">
             <div class="note">Note: As per NEP 2020, the Model Syllabus is mostly common across all state universities.</div>
 
             <!-- Skeleton Loader for Syllabus -->
@@ -927,8 +1046,8 @@
             </div>
 
             <!-- Error state for Syllabus -->
-            <div id="syllabus-error" class="error-box">
-                Failed to load syllabus data. Please check your internet connection and try again.
+            <div id="syllabus-error" class="error-box" role="alert" aria-live="assertive">
+                <span id="syllabus-error-msg">Failed to load syllabus data. Please check your internet connection and try again.</span>
                 <br>
                 <button onclick="fetchSyllabusData(true)">Try Again</button>
             </div>
@@ -956,7 +1075,7 @@
                     </select>
                 </div>
 
-                <div id="syllabus-no-data" class="no-data-msg">No syllabus available for this combination.</div>
+                <div id="syllabus-no-data" class="no-data-msg" role="status" aria-live="polite">No syllabus available for this combination.</div>
 
                 <button type="button" class="reset-link" onclick="resetSyllabusForm()">↺ Reset Selection</button>
             </div>
@@ -977,7 +1096,7 @@
    
 
         <!-- TAB 3: Upload PYQ -->
-        <div id="upload-pyq" class="tab-content">
+        <div id="upload-pyq" class="tab-content" role="tabpanel" aria-labelledby="tab-btn-upload">
             <div class="note" style="background: #e0f2fe; color: #0369a1;">
                 Admin Note: Students please upload ONLY previous year question papers here. Verified files will be updated by the admin.
             </div>
@@ -1005,7 +1124,16 @@
     </div>
 
     <script>
+        // ----- Backend configuration -----
+        // Currently backed by a Google Apps Script (reading a Google Sheet).
+        // To migrate to a different backend later (Firebase, Supabase, a real REST
+        // API, etc.), only this section needs to change - everywhere else in the
+        // app just calls fetchSheetData()/fetchSyllabusData() and reads allData /
+        // syllabusData, so the rest of the code doesn't need to know where the data
+        // came from. Keep the JSON shape the same (array of objects with the same
+        // field names used below) and nothing else in the app breaks.
         const SHEETDB_URL = "https://script.google.com/macros/s/AKfycbyHONQkgmzDy7aioQ-al2Ms8o-Ty_IXCyT1yWMskn4MFeT81oWeKRvNpYwGjPikUu2W/exec";
+        const SYLLABUS_QUERY_PARAM = "?sheet=Syllabus";
         const CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes cache, so repeat visits load instantly
         const FETCH_TIMEOUT_MS = 15000; // 15s timeout so a hung request doesn't spin forever
         let allData = [];
@@ -1053,6 +1181,20 @@
             }
         }
 
+        // Returns cached data regardless of age. Used as a last-resort fallback when
+        // the live backend (Apps Script) is unreachable, so the site can still show
+        // last-known-good data instead of a hard error - useful on flaky mobile
+        // networks or if the backend has downtime.
+        function getStaleCache(key) {
+            try {
+                const raw = localStorage.getItem(key);
+                if (!raw) return null;
+                return JSON.parse(raw).data;
+            } catch (e) {
+                return null;
+            }
+        }
+
         function setCache(key, data) {
             try {
                 localStorage.setItem(key, JSON.stringify({ timestamp: Date.now(), data }));
@@ -1064,6 +1206,26 @@
         // ----- State for currently shown results (used by preview/share/bookmark) -----
         let currentPyqResult = null;
         let currentSyllabusResult = null;
+
+        // Inserts a small "showing saved data" notice above the given form, so
+        // students know they're looking at cached (possibly outdated) results
+        // rather than assuming something is broken.
+        function showStaleDataNotice(formContentId) {
+            const container = document.getElementById(formContentId);
+            if (!container || container.querySelector('.stale-notice')) return;
+            const notice = document.createElement('div');
+            notice.className = 'stale-notice';
+            notice.setAttribute('role', 'status');
+            notice.textContent = "⚠️ Couldn't reach the server right now — showing your last saved data.";
+            container.prepend(notice);
+        }
+
+        // ----- Online/offline banner -----
+        function updateOnlineStatus() {
+            document.getElementById('offline-banner').classList.toggle('show', !navigator.onLine);
+        }
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
 
         /* ===================== SIDE DRAWER MENU ===================== */
         function openMenu() {
@@ -1208,10 +1370,15 @@
         // Programmatically switch tabs (used by search) without relying on a click event
         function switchToTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('active');
+                el.setAttribute('aria-selected', 'false');
+            });
             document.getElementById(tabId).classList.add('active');
             const btnIndex = tabId === 'download-pyq' ? 0 : (tabId === 'download-syllabus' ? 1 : 2);
-            document.querySelectorAll('.tab-btn')[btnIndex].classList.add('active');
+            const activeBtn = document.querySelectorAll('.tab-btn')[btnIndex];
+            activeBtn.classList.add('active');
+            activeBtn.setAttribute('aria-selected', 'true');
         }
 
         // Close search dropdown when clicking outside
@@ -1245,7 +1412,25 @@
             return url;
         }
 
+        // ----- Security: only ever preview/open Google Drive links -----
+        // The sheet is admin-controlled, but this is a defense-in-depth check so a
+        // corrupted/mistyped row (or a compromised sheet) can never be used to open
+        // an arbitrary/attacker-controlled URL inside the iframe or download button.
+        function isTrustedDriveUrl(url) {
+            if (!url || typeof url !== 'string') return false;
+            try {
+                const parsed = new URL(url);
+                return parsed.protocol === 'https:' && parsed.hostname === 'drive.google.com';
+            } catch (e) {
+                return false;
+            }
+        }
+
         function openPdfModal(url, title) {
+            if (!isTrustedDriveUrl(url)) {
+                console.error('Blocked untrusted preview URL:', url);
+                return;
+            }
             document.getElementById('pdf-modal-title').textContent = title || 'Preview';
             document.getElementById('pdf-modal-iframe').src = getPreviewUrl(url);
             document.getElementById('pdf-modal-download').href = getDownloadUrl(url);
@@ -1419,10 +1604,14 @@
 
         function switchTab(tabId, evt) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('active');
+                el.setAttribute('aria-selected', 'false');
+            });
             document.getElementById(tabId).classList.add('active');
             if (evt && evt.currentTarget) {
                 evt.currentTarget.classList.add('active');
+                evt.currentTarget.setAttribute('aria-selected', 'true');
             }
 
             if (tabId === 'download-syllabus') {
@@ -1473,8 +1662,24 @@
                 formContent.style.display = 'block';
             } catch (error) {
                 console.error("Error fetching PYQ data:", error);
+
+                // Backend unreachable - fall back to whatever we last cached, even if
+                // stale, rather than blocking the student with a hard error screen.
+                const stale = getStaleCache('pyq-data');
+                if (stale && stale.length) {
+                    allData = stale;
+                    populateUniversities();
+                    loading.style.display = 'none';
+                    formContent.style.display = 'block';
+                    showStaleDataNotice('pyq-form-content');
+                    return;
+                }
+
                 loading.style.display = 'none';
                 formContent.style.display = 'none';
+                document.getElementById('pyq-error-msg').textContent = navigator.onLine
+                    ? 'Failed to load data. Please check your internet connection and try again.'
+                    : 'You appear to be offline and no saved data is available yet.';
                 errorBox.style.display = 'block';
             }
         }
@@ -1509,7 +1714,7 @@
             formContent.style.display = 'none';
 
             try {
-                let syllabusResponse = await fetchWithTimeout(SHEETDB_URL + "?sheet=Syllabus", FETCH_TIMEOUT_MS);
+                let syllabusResponse = await fetchWithTimeout(SHEETDB_URL + SYLLABUS_QUERY_PARAM, FETCH_TIMEOUT_MS);
                 if (!syllabusResponse.ok) throw new Error('Network response was not ok');
                 syllabusData = await syllabusResponse.json();
                 setCache('syllabus-data', syllabusData);
@@ -1519,8 +1724,23 @@
                 formContent.style.display = 'block';
             } catch (error) {
                 console.error("Error fetching Syllabus data:", error);
+
+                const stale = getStaleCache('syllabus-data');
+                if (stale && stale.length) {
+                    syllabusData = stale;
+                    populateSyllabus();
+                    isSyllabusLoaded = true;
+                    loading.style.display = 'none';
+                    formContent.style.display = 'block';
+                    showStaleDataNotice('syllabus-form-content');
+                    return;
+                }
+
                 loading.style.display = 'none';
                 formContent.style.display = 'none';
+                document.getElementById('syllabus-error-msg').textContent = navigator.onLine
+                    ? 'Failed to load syllabus data. Please check your internet connection and try again.'
+                    : 'You appear to be offline and no saved syllabus data is available yet.';
                 errorBox.style.display = 'block';
             }
                 }
@@ -1793,10 +2013,24 @@
         }
 
         window.onload = function() {
+            document.getElementById('footer-year').textContent = new Date().getFullYear();
             initTheme();
             renderSavedPapers();
+            updateOnlineStatus();
             fetchSheetData();
         };
+
+        // ----- PWA: register service worker for offline support -----
+        // Wrapped in a feature check + try/catch so this never breaks the site on
+        // browsers without service worker support (or when served from file://,
+        // where registration is not allowed).
+        if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch((err) => {
+                    console.warn('Service worker registration failed:', err);
+                });
+            });
+        }
     </script>
 </body>
 </html>

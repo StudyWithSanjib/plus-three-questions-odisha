@@ -115,12 +115,12 @@
 <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 <meta name="bingbot" content="index, follow">
 
-<!-- Speed Optimization (Apps Script & Drive Preview Fast Karne Ke Liye) -->
+<!-- Speed Optimization (Drive Preview Fast Karne Ke Liye) -->
 <!-- dns-prefetch is a fallback for older browsers; preconnect (with crossorigin,
      since these are fetch()/iframe requests) does the fuller DNS+TLS handshake
-     ahead of time on modern browsers, shaving real time off the first request. -->
-<link rel="dns-prefetch" href="https://script.google.com">
-<link rel="preconnect" href="https://script.google.com" crossorigin>
+     ahead of time on modern browsers, shaving real time off the first request.
+     script.google.com is no longer hit at page-load time (data.json files are
+     same-origin on GitHub Pages now), so that hint was removed. -->
 <link rel="dns-prefetch" href="https://drive.google.com">
 <link rel="preconnect" href="https://drive.google.com" crossorigin>
 
@@ -1125,15 +1125,21 @@
 
     <script>
         // ----- Backend configuration -----
-        // Currently backed by a Google Apps Script (reading a Google Sheet).
-        // To migrate to a different backend later (Firebase, Supabase, a real REST
-        // API, etc.), only this section needs to change - everywhere else in the
-        // app just calls fetchSheetData()/fetchSyllabusData() and reads allData /
-        // syllabusData, so the rest of the code doesn't need to know where the data
-        // came from. Keep the JSON shape the same (array of objects with the same
-        // field names used below) and nothing else in the app breaks.
-        const SHEETDB_URL = "https://script.google.com/macros/s/AKfycbyHONQkgmzDy7aioQ-al2Ms8o-Ty_IXCyT1yWMskn4MFeT81oWeKRvNpYwGjPikUu2W/exec";
-        const SYLLABUS_QUERY_PARAM = "?sheet=Syllabus";
+        // Data now comes from static JSON files (data/pyq.json, data/syllabus.json)
+        // served straight from GitHub Pages, instead of a live Apps Script call.
+        // A Google Apps Script (Publish.gs.gs, in the Sheet's script project) reads
+        // the Sheet on a timer and pushes these two files to the repo whenever the
+        // Sheet changes - so the Sheet is still the source of truth, it's just no
+        // longer hit on every visitor's page load.
+        // A cache-busting query param is added at request time (see fetchSheetData /
+        // fetchSyllabusData below) so GitHub Pages' HTTP caching doesn't serve an
+        // old copy right after a fresh publish.
+        // To migrate to a different backend later, only this section (plus the two
+        // fetch call sites below) needs to change - everywhere else in the app just
+        // calls fetchSheetData()/fetchSyllabusData() and reads allData / syllabusData,
+        // so the rest of the code doesn't need to know where the data came from.
+        const PYQ_URL = "https://studywithsanjib.github.io/plus-three-questions-odisha/data/pyq.json";
+        const SYLLABUS_URL = "https://studywithsanjib.github.io/plus-three-questions-odisha/data/syllabus.json";
         const CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes cache, so repeat visits load instantly
         const FETCH_TIMEOUT_MS = 15000; // 15s timeout so a hung request doesn't spin forever
         let allData = [];
@@ -1653,7 +1659,10 @@
             formContent.style.display = 'none';
 
             try {
-                let response = await fetchWithTimeout(SHEETDB_URL, FETCH_TIMEOUT_MS);
+                // "?v=" cache-busts against GitHub Pages'/the browser's HTTP cache -
+                // the localStorage layer above (CACHE_TTL_MS) is our real cache, this
+                // param just makes sure a forced refresh actually reaches the origin.
+                let response = await fetchWithTimeout(PYQ_URL + '?v=' + Date.now(), FETCH_TIMEOUT_MS);
                 if (!response.ok) throw new Error('Network response was not ok');
                 allData = await response.json();
                 setCache('pyq-data', allData);
@@ -1714,7 +1723,7 @@
             formContent.style.display = 'none';
 
             try {
-                let syllabusResponse = await fetchWithTimeout(SHEETDB_URL + SYLLABUS_QUERY_PARAM, FETCH_TIMEOUT_MS);
+                let syllabusResponse = await fetchWithTimeout(SYLLABUS_URL + '?v=' + Date.now(), FETCH_TIMEOUT_MS);
                 if (!syllabusResponse.ok) throw new Error('Network response was not ok');
                 syllabusData = await syllabusResponse.json();
                 setCache('syllabus-data', syllabusData);

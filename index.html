@@ -254,15 +254,18 @@
 
         /* Side Drawer Menu */
         .menu-overlay {
-            display: none;
             position: fixed;
             inset: 0;
             background: rgba(0,0,0,0.55);
             z-index: 90;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.28s ease, visibility 0.28s ease;
         }
 
         .menu-overlay.open {
-            display: block;
+            opacity: 1;
+            visibility: visible;
         }
 
         .menu-drawer {
@@ -275,7 +278,7 @@
             background: var(--card-bg);
             z-index: 95;
             transform: translateX(-100%);
-            transition: transform 0.25s ease;
+            transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 4px 0 24px rgba(0,0,0,0.2);
             display: flex;
             flex-direction: column;
@@ -325,11 +328,32 @@
             text-decoration: none;
             font-size: 0.9rem;
             font-weight: 600;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: opacity 0.22s ease, transform 0.22s ease, background-color 0.15s ease;
         }
 
         .menu-nav a:hover {
             background: var(--result-bg);
         }
+
+        /* Links slide/fade in with a slight stagger once the drawer is open,
+           instead of just appearing instantly - purely cosmetic, has no
+           effect on functionality if JS is slow/disabled since the drawer
+           itself already opened via the transform transition above. */
+        .menu-drawer.open .menu-nav a {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .menu-drawer.open .menu-nav a:nth-child(1) { transition-delay: 0.05s; }
+        .menu-drawer.open .menu-nav a:nth-child(2) { transition-delay: 0.09s; }
+        .menu-drawer.open .menu-nav a:nth-child(3) { transition-delay: 0.13s; }
+        .menu-drawer.open .menu-nav a:nth-child(4) { transition-delay: 0.17s; }
+        .menu-drawer.open .menu-nav a:nth-child(6) { transition-delay: 0.21s; }
+        .menu-drawer.open .menu-nav a:nth-child(7) { transition-delay: 0.25s; }
+        .menu-drawer.open .menu-nav a:nth-child(8) { transition-delay: 0.29s; }
+        .menu-drawer.open .menu-nav a:nth-child(9) { transition-delay: 0.33s; }
 
         .menu-nav a .menu-icon {
             font-size: 1.05rem;
@@ -373,10 +397,29 @@
             color: var(--text-muted);
         }
 
-        /* Global Live Search */
+        /* Global Live Search - sticky so it stays reachable while scrolling
+           through long dropdown lists / results. Bleeds edge-to-edge inside
+           the card via negative margins, then restores the padding so its
+           contents still line up with the rest of the layout. */
         .global-search-wrap {
-            position: relative;
-            margin-bottom: 18px;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background: var(--card-bg);
+            margin: 0 -20px 18px -20px;
+            padding: 8px 20px 10px;
+            transition: box-shadow 0.2s ease;
+        }
+
+        @media (min-width: 640px) {
+            .global-search-wrap {
+                margin: 0 -28px 18px -28px;
+                padding: 8px 28px 10px;
+            }
+        }
+
+        .global-search-wrap.is-stuck {
+            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
         }
 
         .global-search-wrap input {
@@ -385,20 +428,25 @@
 
         .global-search-wrap .search-icon {
             position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
+            left: 32px;
+            top: 18px;
             font-size: 0.95rem;
             color: var(--text-muted);
             pointer-events: none;
         }
 
+        @media (min-width: 640px) {
+            .global-search-wrap .search-icon {
+                left: 40px;
+            }
+        }
+
         .search-results {
-            display: none;
+            display: block;
             position: absolute;
-            top: calc(100% + 6px);
-            left: 0;
-            right: 0;
+            top: calc(100% + 2px);
+            left: 20px;
+            right: 20px;
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 10px;
@@ -406,6 +454,25 @@
             overflow-y: auto;
             box-shadow: 0 8px 24px rgba(0,0,0,0.12);
             z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-6px);
+            transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s;
+            pointer-events: none;
+        }
+
+        @media (min-width: 640px) {
+            .search-results {
+                left: 28px;
+                right: 28px;
+            }
+        }
+
+        .search-results.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
         }
 
         .search-result-item {
@@ -414,6 +481,7 @@
             color: var(--text-main);
             cursor: pointer;
             border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.15s ease;
         }
 
         .search-result-item:last-child {
@@ -719,14 +787,39 @@
             border: 1px solid var(--border-color);
             border-radius: 8px;
             font-size: 0.95rem;
-            background-color: #fff;
+            background-color: var(--input-bg);
             color: var(--text-main);
             outline: none;
-            transition: border-color 0.2s;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
         }
 
         select:focus, input:focus, textarea:focus {
             border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+
+        /* Custom-styled dropdowns: hide the native arrow and draw our own so it
+           stays consistent (and theme-aware) across browsers, add a hover
+           state so they feel clickable, and a clearer disabled look so it's
+           obvious a dropdown isn't usable yet until earlier fields are chosen. */
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            padding-right: 38px;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+        }
+
+        select:hover:not(:disabled) {
+            border-color: var(--primary);
+        }
+
+        select:disabled {
+            cursor: not-allowed;
+            opacity: 0.55;
         }
 
         .btn {
@@ -910,6 +1003,7 @@
         </div>
         <nav class="menu-nav">
             <a href="index.html" onclick="closeMenu()"><span class="menu-icon">🏠</span> Home</a>
+            <a href="https://forms.gle/3yTtyBHSWJbjLXEZ7" target="_blank" rel="noopener"><span class="menu-icon">📤</span> Upload PYQ</a>
             <a href="https://forms.gle/iYAU2wPQerUAGFmw7" target="_blank" rel="noopener"><span class="menu-icon">📝</span> Request PYQ</a>
             <a href="https://www.youtube.com/@Studywithsanjibs" target="_blank" rel="noopener"><span class="menu-icon">▶️</span> YouTube Channel</a>
             <div class="menu-divider"></div>
@@ -1101,8 +1195,12 @@
                 Admin Note: Students please upload ONLY previous year question papers here. Verified files will be updated by the admin.
             </div>
             <div style="text-align: center; padding: 30px 10px;">
-                <p style="margin-bottom: 15px; font-size: 0.95rem; color: var(--text-main);">Have a question paper to share? Click below to upload securely via our official form.</p>
+                <p style="margin-bottom: 15px; font-size: 0.95rem; color: var(--text-main);">Help us grow this free collection for every +3 student in Odisha — share your question paper securely below.</p>
                 <a href="https://forms.gle/3yTtyBHSWJbjLXEZ7" target="_blank" class="btn">Open Upload Form 📤</a>
+                <p style="margin-top: 18px; font-size: 0.85rem; color: var(--text-muted);">
+                    Don't find the question paper you're looking for?
+                    <a href="https://forms.gle/iYAU2wPQerUAGFmw7" target="_blank" rel="noopener" style="color: var(--primary); font-weight: 600; text-decoration: none;">Request PYQ →</a>
+                </p>
             </div>
         </div>
     </div>
@@ -1278,12 +1376,20 @@
         }
 
         /* ===================== 2. GLOBAL LIVE SEARCH ===================== */
+        // Small debounce so a fast typist doesn't re-run the search (and re-render
+        // the results list) on every single keystroke - waits for a short pause.
+        let searchDebounceTimer = null;
         function handleGlobalSearch() {
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(runGlobalSearch, 120);
+        }
+
+        function runGlobalSearch() {
             const query = document.getElementById('global-search').value.trim().toLowerCase();
             const resultsBox = document.getElementById('search-results');
 
             if (!query) {
-                resultsBox.style.display = 'none';
+                resultsBox.classList.remove('show');
                 resultsBox.innerHTML = '';
                 return;
             }
@@ -1324,7 +1430,7 @@
 
             if (matches.length === 0) {
                 resultsBox.innerHTML = '<div class="search-no-results">No results found.</div>';
-                resultsBox.style.display = 'block';
+                resultsBox.classList.add('show');
                 return;
             }
 
@@ -1336,11 +1442,11 @@
                 resultsBox.appendChild(div);
             });
 
-            resultsBox.style.display = 'block';
+            resultsBox.classList.add('show');
         }
 
         function selectSearchResult(match) {
-            document.getElementById('search-results').style.display = 'none';
+            document.getElementById('search-results').classList.remove('show');
             document.getElementById('global-search').value = '';
 
             if (match.type === 'pyq') {
@@ -1391,9 +1497,32 @@
         document.addEventListener('click', function(e) {
             const wrap = document.querySelector('.global-search-wrap');
             if (wrap && !wrap.contains(e.target)) {
-                document.getElementById('search-results').style.display = 'none';
+                document.getElementById('search-results').classList.remove('show');
             }
         });
+
+        // Close search dropdown on Escape too (menu already handles its own Escape close)
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.getElementById('search-results').classList.remove('show');
+            }
+        });
+
+        // Add a subtle shadow to the sticky search bar once the page has
+        // scrolled past it, so it visually "lifts" off the content below.
+        (function initStickySearchShadow() {
+            const wrap = document.querySelector('.global-search-wrap');
+            if (!wrap) return;
+            const sentinel = document.createElement('div');
+            sentinel.style.height = '1px';
+            wrap.parentNode.insertBefore(sentinel, wrap);
+            if ('IntersectionObserver' in window) {
+                new IntersectionObserver(
+                    ([entry]) => wrap.classList.toggle('is-stuck', !entry.isIntersecting),
+                    { threshold: 0 }
+                ).observe(sentinel);
+            }
+        })();
 
         /* ===================== 3. IN-APP PDF PREVIEW MODAL ===================== */
         // Converts a normal Google Drive share link into embeddable preview + direct download URLs

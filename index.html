@@ -277,6 +277,70 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* Compact Subscribe + Search icons - hidden (zero width, scaled down)
+           until .top-bar gets the "scrolled" class from the IntersectionObserver
+           below, then pop in with a small bounce so the appearance feels
+           deliberate rather than jarring. */
+        .top-bar-compact-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .compact-icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 0;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 0.95rem;
+            border: none;
+            text-decoration: none;
+            cursor: pointer;
+            overflow: hidden;
+            opacity: 0;
+            transform: scale(0.4);
+            pointer-events: none;
+            transition: width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        opacity 0.2s ease;
+        }
+
+        .top-bar.scrolled .compact-icon-btn {
+            width: 36px;
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+
+        /* Slight stagger so the two icons don't pop in at exactly the same
+           instant - reads as a nicer, more deliberate animation. */
+        .top-bar.scrolled .compact-subscribe-btn { transition-delay: 0s; }
+        .top-bar.scrolled .compact-search-btn { transition-delay: 0.07s; }
+
+        .compact-subscribe-btn {
+            background-color: var(--yt-red);
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(255, 0, 0, 0.25);
+        }
+
+        @keyframes compactSubscribePulse {
+            0%, 100% { box-shadow: 0 2px 8px rgba(255,0,0,0.25), 0 0 0 0 rgba(255,0,0,0.35); }
+            50% { box-shadow: 0 2px 8px rgba(255,0,0,0.25), 0 0 0 6px rgba(255,0,0,0); }
+        }
+
+        .top-bar.scrolled .compact-subscribe-btn {
+            animation: compactSubscribePulse 2.6s ease-in-out infinite;
+        }
+
+        .compact-search-btn {
+            background: var(--result-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
         }
 
         /* Side Drawer Menu */
@@ -422,31 +486,50 @@
             font-size: 0.75rem;
             font-weight: 600;
             color: var(--text-muted);
+            flex-shrink: 0;
+            transition: padding 0.25s ease, gap 0.25s ease;
         }
 
-        /* Global Live Search - sticky so it stays reachable while scrolling
-           through long dropdown lists / results. Bleeds edge-to-edge inside
-           the card via negative margins, then restores the padding so its
-           contents still line up with the rest of the layout. */
+        /* The label text collapses (not just fades) when scrolled, so the
+           button visually shrinks down to a small round icon-only button
+           instead of staying pill-shaped with empty space inside it. */
+        .toggle-label-text {
+            display: inline-block;
+            max-width: 70px;
+            opacity: 1;
+            overflow: hidden;
+            white-space: nowrap;
+            transition: max-width 0.25s ease, opacity 0.18s ease;
+        }
+
+        .top-bar.scrolled .theme-toggle {
+            padding: 8px;
+            gap: 0;
+        }
+
+        .top-bar.scrolled .toggle-label-text {
+            max-width: 0;
+            opacity: 0;
+        }
+
+        /* Global Live Search - kept in normal document flow (not sticky).
+           The compact search icon in the top-bar (visible once scrolled)
+           jumps the page back here and briefly flashes a highlight ring so
+           it's obvious where you landed, instead of the search bar itself
+           following you down the page. */
         .global-search-wrap {
-            position: sticky;
-            top: var(--topbar-h, 56px);
-            z-index: 40;
-            background: var(--card-bg);
-            margin: 0 -20px 18px -20px;
-            padding: 8px 20px 10px;
-            transition: box-shadow 0.2s ease;
+            position: relative;
+            margin-bottom: 18px;
+            border-radius: 10px;
         }
 
-        @media (min-width: 640px) {
-            .global-search-wrap {
-                margin: 0 -28px 18px -28px;
-                padding: 8px 28px 10px;
-            }
+        @keyframes searchFlashRing {
+            0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.35); }
+            100% { box-shadow: 0 0 0 12px rgba(79, 70, 229, 0); }
         }
 
-        .global-search-wrap.is-stuck {
-            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+        .global-search-wrap.search-flash {
+            animation: searchFlashRing 0.7s ease-out;
         }
 
         .global-search-wrap input {
@@ -455,25 +538,20 @@
 
         .global-search-wrap .search-icon {
             position: absolute;
-            left: 32px;
-            top: 18px;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
             font-size: 0.95rem;
             color: var(--text-muted);
             pointer-events: none;
-        }
-
-        @media (min-width: 640px) {
-            .global-search-wrap .search-icon {
-                left: 40px;
-            }
         }
 
         .search-results {
             display: block;
             position: absolute;
             top: calc(100% + 2px);
-            left: 20px;
-            right: 20px;
+            left: 0;
+            right: 0;
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 10px;
@@ -486,13 +564,6 @@
             transform: translateY(-6px);
             transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s;
             pointer-events: none;
-        }
-
-        @media (min-width: 640px) {
-            .search-results {
-                left: 28px;
-                right: 28px;
-            }
         }
 
         .search-results.show {
@@ -1044,16 +1115,27 @@
 
     <div class="container">
         <div class="offline-banner" id="offline-banner" role="status" aria-live="polite">📴 You're offline — showing saved data where available.</div>
-        <div class="top-bar">
+        <div class="top-bar" id="top-bar">
             <button type="button" class="hamburger-btn" id="hamburger-btn" onclick="openMenu()" aria-label="Open menu">☰</button>
+
+            <!-- These two only become visible (via .top-bar.scrolled) once the
+                 hero section - which already has the full Subscribe button and
+                 search bar - has scrolled out of view. Sitting between the
+                 hamburger and theme toggle in this flex row, "space-between"
+                 on .top-bar naturally centers them without extra CSS. -->
+            <div class="top-bar-compact-actions" id="top-bar-compact-actions">
+                <a href="https://www.youtube.com/@Studywithsanjibs" target="_blank" rel="noopener" class="compact-icon-btn compact-subscribe-btn" aria-label="Subscribe on YouTube" title="Subscribe: Study With Sanjib">▶</a>
+                <button type="button" class="compact-icon-btn compact-search-btn" onclick="jumpToSearch()" aria-label="Jump to search" title="Search">🔍</button>
+            </div>
+
             <button type="button" class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" aria-label="Toggle dark mode">
-                <span id="theme-toggle-icon">🌙</span> <span id="theme-toggle-label">Dark Mode</span>
+                <span id="theme-toggle-icon">🌙</span> <span id="theme-toggle-label" class="toggle-label-text">Dark Mode</span>
             </button>
         </div>
 
         <header>
             <h1>+3 PYQ & Syllabus Hub</h1>
-            <p>Odisha Universities NEP Model Data</p>
+            <p>This website provides only the latest NEP 2020 Syllabus &amp; PYQs</p>
             <a href="https://www.youtube.com/@Studywithsanjibs" target="_blank" class="yt-sub-btn">
                 ▶ Subscribe: Study With Sanjib
             </a>
@@ -1358,22 +1440,24 @@
         window.addEventListener('online', updateOnlineStatus);
         window.addEventListener('offline', updateOnlineStatus);
 
-        // Keep the sticky search bar's top offset in sync with the actual
-        // rendered height of the sticky top-bar above it (hamburger + theme
-        // toggle), instead of hardcoding a pixel value that could drift if
-        // font sizes, padding, or screen width change.
-        (function syncTopBarHeight() {
-            const topBar = document.querySelector('.top-bar');
-            if (!topBar) return;
-            const apply = () => {
-                document.documentElement.style.setProperty('--topbar-h', topBar.getBoundingClientRect().height + 'px');
-            };
-            apply();
-            let resizeTimer = null;
-            window.addEventListener('resize', () => {
-                clearTimeout(resizeTimer);
-                resizeTimer = setTimeout(apply, 150);
-            });
+        // Once the hero section (title, big Subscribe button, search bar) has
+        // scrolled out of view, add "scrolled" to the top-bar so the compact
+        // Subscribe/Search icons pop in and the theme toggle shrinks to an
+        // icon-only button - see the .top-bar.scrolled rules in the CSS.
+        (function initTopBarScrolledState() {
+            const topBar = document.getElementById('top-bar');
+            const heroEnd = document.querySelector('.global-search-wrap');
+            if (!topBar || !heroEnd) return;
+            if (!('IntersectionObserver' in window)) return;
+
+            const sentinel = document.createElement('div');
+            sentinel.style.height = '1px';
+            heroEnd.parentNode.insertBefore(sentinel, heroEnd.nextSibling);
+
+            new IntersectionObserver(
+                ([entry]) => topBar.classList.toggle('scrolled', !entry.isIntersecting),
+                { threshold: 0 }
+            ).observe(sentinel);
         })();
 
         /* ===================== SIDE DRAWER MENU ===================== */
@@ -1553,21 +1637,29 @@
             }
         });
 
-        // Add a subtle shadow to the sticky search bar once the page has
-        // scrolled past it, so it visually "lifts" off the content below.
-        (function initStickySearchShadow() {
+        // Called by the compact search icon in the top-bar (visible once
+        // scrolled past the hero section): scrolls back up to the search bar,
+        // focuses it, and briefly flashes a highlight ring so it's obvious
+        // where the page landed.
+        function jumpToSearch() {
             const wrap = document.querySelector('.global-search-wrap');
-            if (!wrap) return;
-            const sentinel = document.createElement('div');
-            sentinel.style.height = '1px';
-            wrap.parentNode.insertBefore(sentinel, wrap);
-            if ('IntersectionObserver' in window) {
-                new IntersectionObserver(
-                    ([entry]) => wrap.classList.toggle('is-stuck', !entry.isIntersecting),
-                    { threshold: 0 }
-                ).observe(sentinel);
-            }
-        })();
+            const input = document.getElementById('global-search');
+            if (!wrap || !input) return;
+
+            wrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // Delay the focus slightly so the mobile on-screen keyboard doesn't
+            // pop up mid-scroll and fight the smooth-scroll animation.
+            clearTimeout(jumpToSearch._focusTimer);
+            jumpToSearch._focusTimer = setTimeout(() => input.focus(), 350);
+
+            wrap.classList.remove('search-flash');
+            // Force reflow so the animation restarts if triggered again quickly.
+            void wrap.offsetWidth;
+            wrap.classList.add('search-flash');
+            clearTimeout(jumpToSearch._flashTimer);
+            jumpToSearch._flashTimer = setTimeout(() => wrap.classList.remove('search-flash'), 700);
+        }
 
         /* ===================== 3. IN-APP PDF PREVIEW MODAL ===================== */
         // Converts a normal Google Drive share link into embeddable preview + direct download URLs

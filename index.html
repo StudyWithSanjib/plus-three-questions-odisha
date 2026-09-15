@@ -950,6 +950,13 @@
             display: none;
         }
 
+        .paper-credit {
+            font-size: 0.8rem;
+            font-style: italic;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
         .result-box a {
             display: inline-block;
             margin-top: 10px;
@@ -1101,7 +1108,7 @@
         </div>
         <nav class="menu-nav">
             <a href="index.html" onclick="closeMenu()"><span class="menu-icon">🏠</span> Home</a>
-            <a href="https://forms.gle/3yTtyBHSWJbjLXEZ7" target="_blank" rel="noopener"><span class="menu-icon">📤</span> Upload PYQ</a>
+            <a href="https://forms.gle/3yTtyBHSWJbjLXEZ7" target="_blank" rel="noopener"><span class="menu-icon">🌟</span> Become a Contributor</a>
             <a href="https://forms.gle/iYAU2wPQerUAGFmw7" target="_blank" rel="noopener"><span class="menu-icon">📝</span> Request PYQ</a>
             <a href="https://www.youtube.com/@Studywithsanjibs" target="_blank" rel="noopener"><span class="menu-icon">▶️</span> YouTube Channel</a>
             <div class="menu-divider"></div>
@@ -1161,7 +1168,7 @@
         <div class="tabs" role="tablist" aria-label="Site sections">
             <button class="tab-btn active" role="tab" id="tab-btn-pyq" aria-selected="true" aria-controls="download-pyq" onclick="switchTab('download-pyq', event)">Download PYQ</button>
             <button class="tab-btn" role="tab" id="tab-btn-syllabus" aria-selected="false" aria-controls="download-syllabus" onclick="switchTab('download-syllabus', event)">Download Syllabus</button>
-            <button class="tab-btn" role="tab" id="tab-btn-upload" aria-selected="false" aria-controls="upload-pyq" onclick="switchTab('upload-pyq', event)">Upload PYQ</button>
+            <button class="tab-btn" role="tab" id="tab-btn-upload" aria-selected="false" aria-controls="upload-pyq" onclick="switchTab('upload-pyq', event)">Contribute</button>
         </div>
 
             <!-- TAB 1: Download PYQ -->
@@ -1226,6 +1233,7 @@
 
             <div id="pyq-result" class="result-box">
                 <p id="paper-details" style="font-weight: 600; margin-bottom: 5px;"></p>
+                <p id="paper-credit" class="paper-credit" style="display:none;"></p>
                 <div class="result-row">
                     <button type="button" class="action-btn preview-btn" style="flex:1;" onclick="openCurrentPreview('pyq')">📄 Preview & Download</button>
                     <button type="button" class="star-btn" id="pyq-star-btn" onclick="toggleBookmark('pyq')" title="Save this paper">☆</button>
@@ -1298,14 +1306,14 @@
         
    
 
-        <!-- TAB 3: Upload PYQ -->
+        <!-- TAB 3: Become a Contributor -->
         <div id="upload-pyq" class="tab-content" role="tabpanel" aria-labelledby="tab-btn-upload">
             <div class="note" style="background: #e0f2fe; color: #0369a1;">
                 Admin Note: Students please upload ONLY previous year question papers here. Verified files will be updated by the admin.
             </div>
             <div style="text-align: center; padding: 30px 10px;">
-                <p style="margin-bottom: 15px; font-size: 0.95rem; color: var(--text-main);">Help us grow this free collection for every +3 student in Odisha — share your question paper securely below.</p>
-                <a href="https://forms.gle/3yTtyBHSWJbjLXEZ7" target="_blank" class="btn">Open Upload Form 📤</a>
+                <p style="margin-bottom: 15px; font-size: 0.95rem; color: var(--text-main);">Help us grow this free collection for every +3 student in Odisha — share your question paper securely below, and get credited for it on the site.</p>
+                <a href="https://forms.gle/3yTtyBHSWJbjLXEZ7" target="_blank" class="btn">Become a Contributor 🌟</a>
                 <p style="margin-top: 18px; font-size: 0.85rem; color: var(--text-muted);">
                     Don't find the question paper you're looking for?
                     <a href="https://forms.gle/iYAU2wPQerUAGFmw7" target="_blank" rel="noopener" style="color: var(--primary); font-weight: 600; text-decoration: none;">Request PYQ →</a>
@@ -2146,16 +2154,50 @@
             let select = document.getElementById('year-select');
             let linkBox = document.getElementById('pyq-result');
             let details = document.getElementById('paper-details');
+            let creditEl = document.getElementById('paper-credit');
             let paperSelect = document.getElementById('paper-select');
 
             if(select.value) {
                 const title = paperSelect.options[paperSelect.selectedIndex].text + " (" + select.options[select.selectedIndex].text + ")";
                 details.innerText = title;
+
+                // Look up the exact matching row (same filters as loadYears(), plus the
+                // chosen drivelink) so we can show who contributed this specific paper,
+                // if that column has been filled in for it.
+                let uni = document.getElementById('uni-select').value;
+                let sub = document.getElementById('sub-select').value;
+                let sem = document.getElementById('sem-select').value;
+                let paper = paperSelect.value;
+                let matchedItem = allData.find(item =>
+                    item.university === uni &&
+                    item.subject === sub &&
+                    item.semester === sem &&
+                    item.papername === paper &&
+                    item.drivelink === select.value
+                );
+
+                // "contributedby" matches the Sheet1 column name (lowercase, no
+                // spaces, same convention as university/subject/papername/etc.).
+                // Rows that don't have this filled in simply won't show a credit
+                // line - nothing breaks either way.
+                const contributor = matchedItem ? String(matchedItem.contributedby || '').trim() : '';
+                if (contributor) {
+                    // textContent (not innerHTML) so contributor-entered names can never
+                    // inject markup/scripts - it's always shown as plain text.
+                    creditEl.textContent = '🙌 Provided by: ' + contributor;
+                    creditEl.style.display = 'block';
+                } else {
+                    creditEl.textContent = '';
+                    creditEl.style.display = 'none';
+                }
+
                 currentPyqResult = { id: 'pyq:' + select.value, title: title, url: select.value, type: 'pyq' };
                 updateStarState('pyq');
                 linkBox.style.display = 'block';
             } else {
                 currentPyqResult = null;
+                creditEl.textContent = '';
+                creditEl.style.display = 'none';
                 linkBox.style.display = 'none';
             }
         }

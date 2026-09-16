@@ -183,6 +183,40 @@
             color: var(--text-main);
         }
 
+        /* These boxes (warning note, admin note, error box, "no data" box,
+           stale-cache notice) previously used fixed light-mode colors, so in
+           dark mode they showed up as bright light patches clashing with the
+           dark card behind them. Muted, theme-matching tones instead. */
+        html[data-theme="dark"] .note {
+            background: #422006;
+            color: #fbbf24;
+        }
+
+        html[data-theme="dark"] .note-info {
+            background: #082f49;
+            color: #7dd3fc;
+        }
+
+        html[data-theme="dark"] .error-box {
+            background: #450a0a;
+            color: #fca5a5;
+        }
+
+        html[data-theme="dark"] .error-box button {
+            background-color: #b91c1c;
+            color: #fff;
+        }
+
+        html[data-theme="dark"] .no-data-msg {
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+        }
+
+        html[data-theme="dark"] .stale-notice {
+            background: #422006;
+            color: #fbbf24;
+        }
+
         html {
             transition: background-color 0.2s;
         }
@@ -643,6 +677,24 @@
             color: var(--text-muted);
         }
 
+        /* "Show more" row - appears at the bottom of the dropdown when there
+           are more matches than currently rendered, so the list never dumps
+           a huge/laggy DOM on a big query. */
+        .search-show-more {
+            padding: 10px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+            color: var(--primary);
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+
+        .search-show-more:hover,
+        .search-show-more.highlighted {
+            background: var(--result-bg);
+        }
+
         /* Saved Papers section */
         .saved-section {
             display: none;
@@ -836,6 +888,18 @@
             font-weight: 600;
         }
 
+        /* Some mobile browsers block Google Drive's iframe embed (Google's own
+           policy, not something this site controls), so the preview area can
+           show blank/an error there. This note tells users the download
+           button below still works either way. */
+        .pdf-preview-note {
+            font-size: 0.75rem;
+            line-height: 1.4;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
         /* YouTube Subscribe Button */
         .yt-sub-btn {
             display: inline-flex;
@@ -1010,6 +1074,14 @@
             margin-bottom: 15px;
         }
 
+        /* Blue "informational" variant of .note (used for the admin note on
+           the Contribute tab) - was previously an inline style, which meant
+           it couldn't be overridden for dark mode. */
+        .note-info {
+            color: #0369a1;
+            background: #e0f2fe;
+        }
+
         .loading {
             text-align: center;
             font-size: 0.9rem;
@@ -1134,9 +1206,9 @@
 
     <!-- Side Drawer Menu -->
     <div class="menu-overlay" id="menu-overlay" onclick="closeMenu()"></div>
-    <div class="menu-drawer" id="menu-drawer">
+    <div class="menu-drawer" id="menu-drawer" role="dialog" aria-modal="true" aria-labelledby="menu-drawer-title">
         <div class="menu-drawer-header">
-            <h2>+3 PYQ & Syllabus Hub</h2>
+            <h2 id="menu-drawer-title">+3 PYQ & Syllabus Hub</h2>
             <button type="button" class="menu-close-btn" onclick="closeMenu()" aria-label="Close menu">&times;</button>
         </div>
         <nav class="menu-nav">
@@ -1157,7 +1229,7 @@
         <div class="offline-banner" id="offline-banner" role="status" aria-live="polite">📴 You're offline — showing saved data where available.</div>
         <div class="top-bar" id="top-bar">
             <div class="top-bar-left">
-                <button type="button" class="hamburger-btn" id="hamburger-btn" onclick="openMenu()" aria-label="Open menu">☰</button>
+                <button type="button" class="hamburger-btn" id="hamburger-btn" onclick="openMenu()" aria-label="Open menu" aria-expanded="false" aria-controls="menu-drawer">☰</button>
                 <!-- Only visible (via .top-bar.scrolled) once the hero section
                      has scrolled out of view - sits right next to the hamburger. -->
                 <button type="button" class="compact-icon-btn compact-search-btn" onclick="jumpToSearch()" aria-label="Jump to search" title="Search">🔍</button>
@@ -1269,7 +1341,7 @@
                 <p id="paper-credit" class="paper-credit" style="display:none;"></p>
                 <div class="result-row">
                     <button type="button" class="action-btn preview-btn" style="flex:1;" onclick="openCurrentPreview('pyq')">📄 Preview & Download</button>
-                    <button type="button" class="star-btn" id="pyq-star-btn" onclick="toggleBookmark('pyq')" title="Save this paper">☆</button>
+                    <button type="button" class="star-btn" id="pyq-star-btn" onclick="toggleBookmark('pyq')" title="Save this paper" aria-label="Save this paper">☆</button>
                 </div>
                 <div class="result-actions">
                     <button type="button" class="action-btn whatsapp-btn" onclick="shareOnWhatsapp('pyq')">📲 Share</button>
@@ -1328,7 +1400,7 @@
                 <p id="syllabus-details" style="font-weight: 600; margin-bottom: 5px;">NEP Model Syllabus PDF</p>
                 <div class="result-row">
                     <button type="button" class="action-btn preview-btn" style="flex:1;" onclick="openCurrentPreview('syllabus')">📄 Preview & Download</button>
-                    <button type="button" class="star-btn" id="syllabus-star-btn" onclick="toggleBookmark('syllabus')" title="Save this syllabus">☆</button>
+                    <button type="button" class="star-btn" id="syllabus-star-btn" onclick="toggleBookmark('syllabus')" title="Save this syllabus" aria-label="Save this syllabus">☆</button>
                 </div>
                 <div class="result-actions">
                     <button type="button" class="action-btn whatsapp-btn" onclick="shareOnWhatsapp('syllabus')">📲 Share</button>
@@ -1341,7 +1413,7 @@
 
         <!-- TAB 3: Become a Contributor -->
         <div id="upload-pyq" class="tab-content" role="tabpanel" aria-labelledby="tab-btn-upload">
-            <div class="note" style="background: #e0f2fe; color: #0369a1;">
+            <div class="note note-info">
                 Admin Note: Students please upload ONLY previous year question papers here. Verified files will be updated by the admin.
             </div>
             <div style="text-align: center; padding: 30px 10px;">
@@ -1357,7 +1429,7 @@
 
     <!-- PDF Preview Modal -->
     <div class="pdf-modal-overlay" id="pdf-modal-overlay" onclick="if(event.target===this) closePdfModal()">
-        <div class="pdf-modal">
+        <div class="pdf-modal" role="dialog" aria-modal="true" aria-labelledby="pdf-modal-title">
             <div class="pdf-modal-header">
                 <h3 id="pdf-modal-title">Preview</h3>
                 <button type="button" class="pdf-modal-close" onclick="closePdfModal()" aria-label="Close preview">&times;</button>
@@ -1366,6 +1438,7 @@
                 <iframe id="pdf-modal-iframe" src="" title="PDF Preview"></iframe>
             </div>
             <div class="pdf-modal-footer">
+                <p class="pdf-preview-note">Preview kabhi-kabhi kuch mobiles/browsers par load nahi hota (Google Drive ki policy ki wajah se). Aisa ho toh neeche diye Download button se PDF seedha download kar lo.</p>
                 <a id="pdf-modal-download" href="#" target="_blank" rel="noopener">⬇ Download PDF</a>
             </div>
         </div>
@@ -1530,21 +1603,87 @@
             });
         })();
 
+        /* ===================== ACCESSIBILITY: FOCUS TRAP ===================== */
+        // Shared helper for any modal/drawer on the page: keeps Tab/Shift+Tab
+        // cycling inside the open container (instead of leaking focus to page
+        // content hidden behind the overlay), moves focus in on open, and
+        // restores it to whatever element opened the modal/drawer on close -
+        // standard expected behaviour for keyboard and screen-reader users.
+        let activeFocusTrap = null;
+
+        function getFocusableEls(container) {
+            return Array.from(container.querySelectorAll(
+                'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), iframe, [tabindex]:not([tabindex="-1"])'
+            )).filter(el => el.offsetParent !== null); // skip hidden/display:none elements
+        }
+
+        function trapFocus(container) {
+            const focusable = getFocusableEls(container);
+            const previouslyFocused = document.activeElement;
+
+            if (focusable.length > 0) focusable[0].focus();
+
+            function handleTrapKeydown(e) {
+                if (e.key !== 'Tab') return;
+                const items = getFocusableEls(container);
+                if (items.length === 0) return;
+                const first = items[0];
+                const last = items[items.length - 1];
+
+                if (e.shiftKey && document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
+            }
+
+            container.addEventListener('keydown', handleTrapKeydown);
+            activeFocusTrap = { container, handleTrapKeydown, previouslyFocused };
+        }
+
+        function releaseFocusTrap() {
+            if (!activeFocusTrap) return;
+            activeFocusTrap.container.removeEventListener('keydown', activeFocusTrap.handleTrapKeydown);
+            // Send focus back to whatever triggered the modal/drawer (e.g. the
+            // hamburger or preview button) so keyboard users land back where
+            // they were, instead of resetting to the top of the page.
+            if (activeFocusTrap.previouslyFocused && document.body.contains(activeFocusTrap.previouslyFocused)) {
+                activeFocusTrap.previouslyFocused.focus();
+            }
+            activeFocusTrap = null;
+        }
+
         /* ===================== SIDE DRAWER MENU ===================== */
         function openMenu() {
             document.getElementById('menu-drawer').classList.add('open');
             document.getElementById('menu-overlay').classList.add('open');
+            document.getElementById('hamburger-btn').setAttribute('aria-expanded', 'true');
             document.body.style.overflow = 'hidden';
+            trapFocus(document.getElementById('menu-drawer'));
         }
 
         function closeMenu() {
             document.getElementById('menu-drawer').classList.remove('open');
             document.getElementById('menu-overlay').classList.remove('open');
+            document.getElementById('hamburger-btn').setAttribute('aria-expanded', 'false');
             document.body.style.overflow = '';
+            releaseFocusTrap();
         }
 
+        // Single Escape handler for every overlay on the page - checks the PDF
+        // modal first since it can be opened from within the drawer's flow too,
+        // then falls back to the drawer. Keeping this in one place (instead of
+        // one listener per overlay) avoids one overlay's close() stepping on
+        // another's still-active focus trap.
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') closeMenu();
+            if (e.key !== 'Escape') return;
+            if (document.getElementById('pdf-modal-overlay').classList.contains('open')) {
+                closePdfModal();
+            } else if (document.getElementById('menu-drawer').classList.contains('open')) {
+                closeMenu();
+            }
         });
 
         /* ===================== 1. DARK / LIGHT MODE ===================== */
@@ -1580,6 +1719,10 @@
         let searchDebounceTimer = null;
         let currentSearchMatches = [];
         let highlightedSearchIndex = -1;
+        // How many results are currently rendered - starts at one page and
+        // grows via the "Show more" row instead of dumping everything at once.
+        const SEARCH_PAGE_SIZE = 15;
+        let searchVisibleCount = SEARCH_PAGE_SIZE;
 
         function handleGlobalSearch() {
             clearTimeout(searchDebounceTimer);
@@ -1590,6 +1733,7 @@
             const query = document.getElementById('global-search').value.trim().toLowerCase();
             const resultsBox = document.getElementById('search-results');
             highlightedSearchIndex = -1;
+            searchVisibleCount = SEARCH_PAGE_SIZE; // reset paging on every new search
 
             if (!query) {
                 resultsBox.classList.remove('show');
@@ -1630,16 +1774,28 @@
                 });
             }
 
-            resultsBox.innerHTML = '';
-            currentSearchMatches = matches.slice(0, 15);
+            // Keep every match (not just the first page) so "Show more" has
+            // something to reveal; rendering itself is paginated separately.
+            currentSearchMatches = matches;
+            renderSearchResults();
+        }
 
-            if (matches.length === 0) {
+        // Renders currentSearchMatches up to searchVisibleCount, plus a
+        // "Show more" row if there are additional matches beyond that.
+        // Split out from runGlobalSearch so clicking "Show more" can just
+        // re-render without re-running the whole search.
+        function renderSearchResults() {
+            const resultsBox = document.getElementById('search-results');
+            resultsBox.innerHTML = '';
+
+            if (currentSearchMatches.length === 0) {
                 resultsBox.innerHTML = '<div class="search-no-results">No results found.</div>';
                 resultsBox.classList.add('show');
                 return;
             }
 
-            currentSearchMatches.forEach((m, idx) => {
+            const visibleMatches = currentSearchMatches.slice(0, searchVisibleCount);
+            visibleMatches.forEach((m, idx) => {
                 const div = document.createElement('div');
                 div.className = 'search-result-item';
                 div.setAttribute('role', 'option');
@@ -1649,15 +1805,32 @@
                 resultsBox.appendChild(div);
             });
 
+            const remaining = currentSearchMatches.length - searchVisibleCount;
+            if (remaining > 0) {
+                const moreRow = document.createElement('div');
+                moreRow.className = 'search-show-more';
+                moreRow.setAttribute('role', 'button');
+                moreRow.tabIndex = 0;
+                moreRow.textContent = `Show ${Math.min(remaining, SEARCH_PAGE_SIZE)} more result${remaining > 1 ? 's' : ''} ↓`;
+                moreRow.onclick = (e) => {
+                    e.stopPropagation();
+                    searchVisibleCount += SEARCH_PAGE_SIZE;
+                    renderSearchResults();
+                };
+                resultsBox.appendChild(moreRow);
+            }
+
             resultsBox.classList.add('show');
         }
 
         // Arrow-key navigation + Enter-to-select for the search dropdown (Escape
         // to close is already handled by the existing global keydown listener).
+        // Includes the "Show more" row (if present) as the last stop, so
+        // keyboard-only users can reach it too, not just mouse/touch users.
         function handleSearchKeydown(e) {
             const resultsBox = document.getElementById('search-results');
             if (!resultsBox.classList.contains('show') || currentSearchMatches.length === 0) return;
-            const items = resultsBox.querySelectorAll('.search-result-item');
+            const items = resultsBox.querySelectorAll('.search-result-item, .search-show-more');
 
             if (e.key === 'ArrowDown') {
                 e.preventDefault();
@@ -1670,7 +1843,13 @@
             } else if (e.key === 'Enter') {
                 e.preventDefault();
                 const idx = highlightedSearchIndex >= 0 ? highlightedSearchIndex : 0;
-                if (currentSearchMatches[idx]) selectSearchResult(currentSearchMatches[idx]);
+                const el = items[idx];
+                if (!el) return;
+                if (el.classList.contains('search-show-more')) {
+                    el.click();
+                } else if (currentSearchMatches[idx]) {
+                    selectSearchResult(currentSearchMatches[idx]);
+                }
             }
         }
 
@@ -1815,12 +1994,14 @@
             document.getElementById('pdf-modal-download').href = getDownloadUrl(url);
             document.getElementById('pdf-modal-overlay').classList.add('open');
             document.body.style.overflow = 'hidden';
+            trapFocus(document.querySelector('.pdf-modal'));
         }
 
         function closePdfModal() {
             document.getElementById('pdf-modal-overlay').classList.remove('open');
             document.getElementById('pdf-modal-iframe').src = '';
             document.body.style.overflow = '';
+            releaseFocusTrap();
         }
 
         function openCurrentPreview(type) {
@@ -1888,9 +2069,13 @@
             if (isBookmarked(result.id)) {
                 btn.textContent = '★';
                 btn.classList.add('active');
+                btn.setAttribute('aria-label', 'Remove from saved papers');
+                btn.title = 'Remove from saved papers';
             } else {
                 btn.textContent = '☆';
                 btn.classList.remove('active');
+                btn.setAttribute('aria-label', 'Save this ' + (type === 'pyq' ? 'paper' : 'syllabus'));
+                btn.title = 'Save this ' + (type === 'pyq' ? 'paper' : 'syllabus');
             }
         }
 

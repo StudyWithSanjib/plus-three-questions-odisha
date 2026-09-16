@@ -1474,10 +1474,39 @@
             sentinel.style.height = '1px';
             heroEnd.parentNode.insertBefore(sentinel, heroEnd.nextSibling);
 
-            new IntersectionObserver(
+            // Without this, IntersectionObserver only flips once the sentinel
+            // passes the literal top edge of the screen (y=0) - but the sticky
+            // top-bar itself already covers the first ~60-70px of that space,
+            // so the search bar visually disappears well before the trigger
+            // fired, leaving an annoying "dead zone" of extra scrolling.
+            // Shrinking the effective viewport top by the top-bar's own height
+            // makes "scrolled" fire the instant the search bar actually goes
+            // behind it, matching what the eye sees.
+            let topBarHeight = topBar.getBoundingClientRect().height;
+            let observer = new IntersectionObserver(
                 ([entry]) => topBar.classList.toggle('scrolled', !entry.isIntersecting),
-                { threshold: 0 }
-            ).observe(sentinel);
+                { threshold: 0, rootMargin: `-${topBarHeight}px 0px 0px 0px` }
+            );
+            observer.observe(sentinel);
+
+            // If the top-bar's height ever changes (e.g. font size/zoom/rotate),
+            // rebuild the observer with the fresh height so the trigger point
+            // stays accurate.
+            let resizeTimer = null;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    const newHeight = topBar.getBoundingClientRect().height;
+                    if (newHeight === topBarHeight) return;
+                    topBarHeight = newHeight;
+                    observer.disconnect();
+                    observer = new IntersectionObserver(
+                        ([entry]) => topBar.classList.toggle('scrolled', !entry.isIntersecting),
+                        { threshold: 0, rootMargin: `-${topBarHeight}px 0px 0px 0px` }
+                    );
+                    observer.observe(sentinel);
+                }, 200);
+            });
         })();
 
         /* ===================== SIDE DRAWER MENU ===================== */

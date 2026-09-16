@@ -155,6 +155,7 @@
             --result-bg: #f1f5f9;
             --star-color: #cbd5e1;
             --star-active: #f59e0b;
+            --select-arrow: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
         }
 
         /* Dark Mode overrides - toggled via [data-theme="dark"] on <html> */
@@ -167,6 +168,7 @@
             --input-bg: #0f172a;
             --result-bg: #0f172a;
             --star-color: #475569;
+            --select-arrow: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
         }
 
         html[data-theme="dark"] .skeleton-box {
@@ -346,7 +348,10 @@
         }
 
         .top-bar.scrolled .compact-subscribe-btn {
-            animation: compactSubscribePulse 2.6s ease-in-out infinite;
+            /* Runs a handful of times to draw the eye right after it appears,
+               then settles - an animation that never stops can get distracting
+               over a long browsing session. */
+            animation: compactSubscribePulse 2.6s ease-in-out 4;
         }
 
         .compact-search-btn {
@@ -598,7 +603,8 @@
             border-bottom: none;
         }
 
-        .search-result-item:hover {
+        .search-result-item:hover,
+        .search-result-item.highlighted {
             background: var(--result-bg);
         }
 
@@ -917,7 +923,7 @@
             -webkit-appearance: none;
             cursor: pointer;
             padding-right: 38px;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-image: var(--select-arrow);
             background-repeat: no-repeat;
             background-position: right 12px center;
             background-size: 16px;
@@ -1163,7 +1169,7 @@
         <!-- Global Live Search -->
         <div class="global-search-wrap">
             <span class="search-icon">🔍</span>
-            <input type="text" id="global-search" placeholder="Search University, Subject or Paper..." autocomplete="off" oninput="handleGlobalSearch()" onfocus="handleGlobalSearch()">
+            <input type="text" id="global-search" placeholder="Search University, Subject or Paper..." autocomplete="off" oninput="handleGlobalSearch()" onfocus="handleGlobalSearch()" onkeydown="handleSearchKeydown(event)">
             <div id="search-results" class="search-results" role="listbox" aria-live="polite"></div>
         </div>
 
@@ -1557,6 +1563,9 @@
         // Small debounce so a fast typist doesn't re-run the search (and re-render
         // the results list) on every single keystroke - waits for a short pause.
         let searchDebounceTimer = null;
+        let currentSearchMatches = [];
+        let highlightedSearchIndex = -1;
+
         function handleGlobalSearch() {
             clearTimeout(searchDebounceTimer);
             searchDebounceTimer = setTimeout(runGlobalSearch, 120);
@@ -1565,10 +1574,12 @@
         function runGlobalSearch() {
             const query = document.getElementById('global-search').value.trim().toLowerCase();
             const resultsBox = document.getElementById('search-results');
+            highlightedSearchIndex = -1;
 
             if (!query) {
                 resultsBox.classList.remove('show');
                 resultsBox.innerHTML = '';
+                currentSearchMatches = [];
                 return;
             }
 
@@ -1605,6 +1616,7 @@
             }
 
             resultsBox.innerHTML = '';
+            currentSearchMatches = matches.slice(0, 15);
 
             if (matches.length === 0) {
                 resultsBox.innerHTML = '<div class="search-no-results">No results found.</div>';
@@ -1612,15 +1624,46 @@
                 return;
             }
 
-            matches.slice(0, 15).forEach((m, idx) => {
+            currentSearchMatches.forEach((m, idx) => {
                 const div = document.createElement('div');
                 div.className = 'search-result-item';
+                div.setAttribute('role', 'option');
+                div.dataset.index = idx;
                 div.innerHTML = `<span class="tag ${m.type}">${m.type === 'pyq' ? 'PYQ' : 'SYLLABUS'}</span>${escapeHtml(m.label)}`;
                 div.onclick = () => selectSearchResult(m);
                 resultsBox.appendChild(div);
             });
 
             resultsBox.classList.add('show');
+        }
+
+        // Arrow-key navigation + Enter-to-select for the search dropdown (Escape
+        // to close is already handled by the existing global keydown listener).
+        function handleSearchKeydown(e) {
+            const resultsBox = document.getElementById('search-results');
+            if (!resultsBox.classList.contains('show') || currentSearchMatches.length === 0) return;
+            const items = resultsBox.querySelectorAll('.search-result-item');
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                highlightedSearchIndex = Math.min(highlightedSearchIndex + 1, items.length - 1);
+                updateSearchHighlight(items);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                highlightedSearchIndex = Math.max(highlightedSearchIndex - 1, 0);
+                updateSearchHighlight(items);
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                const idx = highlightedSearchIndex >= 0 ? highlightedSearchIndex : 0;
+                if (currentSearchMatches[idx]) selectSearchResult(currentSearchMatches[idx]);
+            }
+        }
+
+        function updateSearchHighlight(items) {
+            items.forEach((el, i) => {
+                el.classList.toggle('highlighted', i === highlightedSearchIndex);
+                if (i === highlightedSearchIndex) el.scrollIntoView({ block: 'nearest' });
+            });
         }
 
         function selectSearchResult(match) {
@@ -2391,7 +2434,12 @@
             initTheme();
             renderSavedPapers();
             updateOnlineStatus();
+            // Both load in parallel up front - previously only fetchSheetData() ran
+            // here, so global search silently missed Syllabus results until the user
+            // opened that tab at least once (which populated syllabusData for the
+            // first time). Preloading both closes that gap.
             fetchSheetData();
+            fetchSyllabusData();
         };
 
         // ----- PWA: register service worker for offline support -----

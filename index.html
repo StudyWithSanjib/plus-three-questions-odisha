@@ -2191,6 +2191,20 @@
             loadSubjects();
         }
 
+        // Shared by showDownloadLink() and showSyllabus(): once a result box is
+        // revealed, scroll it into view automatically so students on the last
+        // dropdown step (Year / Subject) immediately see the download button
+        // instead of having to notice and manually scroll down for it.
+        // The small delay lets the browser finish reflowing the layout after
+        // display:block is set, so scrollIntoView measures the correct final
+        // position rather than the box's old (collapsed/hidden) position.
+        function scrollResultIntoView(elId) {
+            setTimeout(() => {
+                const el = document.getElementById(elId);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 50);
+        }
+
         function showDownloadLink() {
             let select = document.getElementById('year-select');
             let linkBox = document.getElementById('pyq-result');
@@ -2235,6 +2249,7 @@
                 currentPyqResult = { id: 'pyq:' + select.value, title: title, url: select.value, type: 'pyq' };
                 updateStarState('pyq');
                 linkBox.style.display = 'block';
+                scrollResultIntoView('pyq-result');
             } else {
                 currentPyqResult = null;
                 creditEl.textContent = '';
@@ -2364,6 +2379,7 @@
                 currentSyllabusResult = { id: 'syllabus:' + select.value, title: title, url: select.value, type: 'syllabus' };
                 updateStarState('syllabus');
                 resBox.style.display = 'block';
+                scrollResultIntoView('syllabus-result');
             } else {
                 currentSyllabusResult = null;
                 resBox.style.display = 'none';

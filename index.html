@@ -1378,9 +1378,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="syllabus-sem-select">2. Select Semester</label>
+                    <label for="syllabus-sem-select">2. Select Paper</label>
                     <select id="syllabus-sem-select" onchange="loadSyllabusSubjects()" disabled>
-                        <option value="">-- Choose Semester --</option>
+                        <option value="">-- Choose Paper --</option>
                     </select>
                 </div>
 
@@ -1760,7 +1760,7 @@
             if (Array.isArray(syllabusData)) {
                 syllabusData.forEach(item => {
                     const category = getSyllabusField(item, ['Category', 'category']);
-                    const semester = getSyllabusField(item, ['Semester', 'semester']);
+                    const semester = getSyllabusField(item, ['Paper', 'paper']);
                     const subjectName = getSyllabusField(item, ['SubjectName', 'Subject Name', 'subjectname', 'subject']);
                     const driveLink = getSyllabusField(item, ['DriveLink', 'Drive Link', 'drivelink']);
                     const haystack = `${category} ${semester} ${subjectName}`.toLowerCase();
@@ -2510,7 +2510,9 @@
         /* ----- SYLLABUS LOGIC ----- */
 
         // Supports the exact column names from the "Syllabus" sheet:
-        // Category | Semester | SubjectName | DriveLink
+        // Category | Paper | SubjectName | DriveLink
+        // (Column B was previously "Semester" - renamed to "Paper" since most
+        // rows apply to all semesters and the sheet is organized by paper.)
         function getSyllabusField(item, names) {
             for (const name of names) {
                 if (item[name] !== undefined && item[name] !== null && String(item[name]).trim() !== "") {
@@ -2526,7 +2528,7 @@
             const subSelect = document.getElementById('syllabus-sub-select');
 
             categorySelect.innerHTML = '<option value="">-- Choose Category --</option>';
-            semSelect.innerHTML = '<option value="">-- Choose Semester --</option>';
+            semSelect.innerHTML = '<option value="">-- Choose Paper --</option>';
             subSelect.innerHTML = '<option value="">-- Choose Subject --</option>';
 
             semSelect.disabled = true;
@@ -2551,7 +2553,7 @@
             const semSelect = document.getElementById('syllabus-sem-select');
             const subSelect = document.getElementById('syllabus-sub-select');
 
-            semSelect.innerHTML = '<option value="">-- Choose Semester --</option>';
+            semSelect.innerHTML = '<option value="">-- Choose Paper --</option>';
             subSelect.innerHTML = '<option value="">-- Choose Subject --</option>';
 
             semSelect.disabled = !category;
@@ -2563,7 +2565,7 @@
             const semesters = [...new Set(
                 syllabusData
                     .filter(item => getSyllabusField(item, ['Category', 'category']) === category)
-                    .map(item => getSyllabusField(item, ['Semester', 'semester']))
+                    .map(item => getSyllabusField(item, ['Paper', 'paper']))
                     .filter(Boolean)
             )];
 
@@ -2587,7 +2589,7 @@
 
             const subjects = syllabusData.filter(item =>
                 getSyllabusField(item, ['Category', 'category']) === category &&
-                getSyllabusField(item, ['Semester', 'semester']) === semester
+                getSyllabusField(item, ['Paper', 'paper']) === semester
             );
 
             let addedAny = false;

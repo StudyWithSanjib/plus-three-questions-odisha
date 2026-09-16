@@ -476,30 +476,19 @@
             margin: 8px 6px;
         }
 
-        /* YouTube Channel link: styled red/white like the platform itself so
-           it's instantly recognizable at a glance, distinct from the other
-           plain-text drawer links. */
-        .menu-nav a.menu-youtube-link {
+        /* YouTube Channel link: only the small icon badge is styled red/white
+           like the platform, matching the size of the other menu icons - the
+           row itself stays a normal link like everything else in the drawer. */
+        .menu-nav a.menu-youtube-link .menu-icon {
             background-color: #ff0000;
             color: #ffffff;
-            margin: 2px 0;
-        }
-
-        .menu-nav a.menu-youtube-link .menu-icon {
-            background-color: #ffffff;
-            color: #ff0000;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            width: 20px;
-            height: 20px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            width: 24px;
+            height: 24px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-        }
-
-        .menu-nav a.menu-youtube-link:hover,
-        .menu-nav a.menu-youtube-link:active {
-            background-color: #cc0000;
         }
 
         .menu-drawer-footer {

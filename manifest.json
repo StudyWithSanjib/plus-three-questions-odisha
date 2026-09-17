@@ -1,6 +1,6 @@
 {
-  "name": "+3 PYQ & Syllabus Hub",
-  "short_name": "PYQ Hub",
+  "name": "+3 Questions & Syllabus",
+  "short_name": "Questions & Syllabus",
   "description": "Download +3 Odisha All Universities (NEP Model) Previous Year Question Papers and Syllabus for Arts, Science, and Commerce.",
   "start_url": "./index.html",
   "scope": "./",
